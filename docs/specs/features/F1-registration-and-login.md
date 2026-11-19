@@ -1,6 +1,6 @@
 # F1 — Registration and login
 
-_Status: Approved · Last updated: 2026-11-19 · Source: product.md §3, §4 (Roles), §5 (Assumptions), MVP row F1_
+_Status: Approved · Last updated: 2026-11-19 · Source: product.md Roles, Assumptions, Goals, MVP scope row F1_
 
 ## Summary
 A visitor creates an account with an email and password, then logs in and out. Every trip belongs to one account, and every trip request checks that the logged-in user owns it. This is the first build step, because nothing else can be safely built without it. Passwords are stored only as hashes.
@@ -19,8 +19,8 @@ A visitor creates an account with an email and password, then logs in and out. E
 - The login check and the ownership check that every trip endpoint uses (the checks are built here; the trip endpoints themselves come in F2–F6).
 
 **Out:**
-- Email verification and password reset (product.md §5, "No email verification or password reset").
-- Sharing trips with other users (product.md §8, "After the core").
+- Email verification and password reset (product.md Assumptions, "No email verification or password reset").
+- Sharing trips with other users (product.md After the core, "After the core").
 - Account deletion and profile editing (not in product.md; out of MVP).
 - Login through a third party (not in product.md; out of scope).
 
@@ -37,14 +37,14 @@ Screen names: Register, Log in. No mock screens exist yet in `docs/design`; the 
 - **F1.R1** Registration takes an email, a password and a confirm-password value, and creates one account per email.
 - **F1.R2** A password must be at least 8 characters. There are no other composition rules.
 - **F1.R3** Before saving, the email is trimmed of surrounding spaces and lowercased. It must have a basic valid format (one `@`, with a dot in the domain part). It must be unique across accounts.
-- **F1.R4** The password is stored only as a salted hash. The plain-text password is never stored, returned, or logged. (product.md §2: "hashed passwords".)
+- **F1.R4** The password is stored only as a salted hash. The plain-text password is never stored, returned, or logged. (product.md Roles: "hashed passwords".)
 - **F1.R5** Login takes an email and password. The email is normalised the same way as in F1.R3 before the lookup.
 - **F1.R6** A failed login (unknown email or wrong password) shows the same message in both cases: "Email or password is incorrect".
 - **F1.R7** A successful registration logs the new user in and sends them to the trip list.
 - **F1.R8** A successful login starts a session that expires 7 days after login. The expiry is fixed; it is not extended by activity.
 - **F1.R9** Logout ends every session of that user, on all devices. Requests made with any of those sessions are then treated as logged out.
 - **F1.R10** Every trip endpoint requires a valid session. A request without a valid session gets a 401 response and no trip data.
-- **F1.R11** Every trip endpoint checks that the trip belongs to the logged-in user. If it does not, the response is 404, the same as for a trip that does not exist. (product.md §2 ownership rule; §6 goal "No user can see or change another user's trips".)
+- **F1.R11** Every trip endpoint checks that the trip belongs to the logged-in user. If it does not, the response is 404, the same as for a trip that does not exist. (product.md Roles, ownership rule; Goals: "No user can see or change another user's trips".)
 
 ## Data & contract
 
