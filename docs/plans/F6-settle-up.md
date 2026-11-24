@@ -63,15 +63,17 @@ Endpoints: `GET /api/trips/{tripId}/settlements`, `POST /api/trips/{tripId}/paym
 
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F6.T1 | Payments table and migration | server/Persistence, migration | F6.AC3 (storage of time and amount) | Migration applies to an empty database. Needs approval (migration). |
-| F6.T2 | Settlement algorithm | server/Features/Settlements/Shared/ | F6.AC1, F6.AC2, F6.AC5, F6.AC6, F6.AC7 | Algorithm tests pass, including worked examples 1 and 3. |
-| F6.T3 | Mark as paid use case | server/Features/Settlements/MarkPaid/ | F6.AC3, F6.AC8, F6.AC15 | Handler tests pass with mocked repositories and a mocked transaction. |
-| F6.T4 | Delete payment use case | server/Features/Settlements/DeletePayment/ | F6.AC4 | Handler tests pass with mocked repositories. |
-| F6.T5 | Balances include payments | server/Features/Balances/Shared/ | F6.AC12 | Calculator test passes with a payment. |
-| F6.T6 | Read model: suggestions and Paid list | server/Features/Settlements/GetSettlements/ | F6.AC9, F6.AC14, F6.AC16 | Handler tests pass (order and row content). |
-| F6.T7 | Payment removal check | server/Features/People/RemovalRules/ | F6.AC10 | Test passes with a mocked payment lookup. |
-| F6.T8 | Ownership checks on settlement requests | server/Features/Settlements/ | F6.AC11 | Guard test passes. |
-| F6.T9 | Settle-up screen and confirmations | client/src/features/settlements/ | F6.AC1, F6.AC2, F6.AC4 (cancel), F6.AC6, F6.AC9 (rows), F6.AC14 | Component tests pass. |
+| Task | Title | Files | ACs covered | Done when |
+|---|---|---|---|---|
+| F6.T1 | Payment entity configuration and migration | server/Persistence/Configurations/PaymentConfiguration.cs, server/Persistence/Migrations/<timestamp>_AddPayments.cs | F6.AC3 (storage of time and amount) | Migration applies to an empty database. Needs approval (migration). |
+| F6.T2 | Settlement algorithm | server/Features/Settlements/Shared/SettlementAlgorithm.cs, server/Features/Settlements/Shared/SettlementSuggestion.cs, tests/Application.Tests/Settlements/SettlementAlgorithmTests.cs | F6.AC1, F6.AC2, F6.AC5, F6.AC6, F6.AC7 | Algorithm tests pass, including worked examples 1 and 3. |
+| F6.T3 | Mark as paid use case | server/Features/Settlements/MarkPaid/MarkPaidCommand.cs, server/Features/Settlements/MarkPaid/MarkPaidValidator.cs, server/Features/Settlements/MarkPaid/MarkPaidHandler.cs, server/Features/Settlements/MarkPaid/MarkPaidEndpoint.cs, tests/Application.Tests/Settlements/MarkPaidHandlerTests.cs | F6.AC3, F6.AC8, F6.AC15 | Handler tests pass with mocked repositories and a mocked transaction. |
+| F6.T4 | Delete payment use case | server/Features/Settlements/DeletePayment/DeletePaymentCommand.cs, server/Features/Settlements/DeletePayment/DeletePaymentHandler.cs, server/Features/Settlements/DeletePayment/DeletePaymentEndpoint.cs, tests/Application.Tests/Settlements/DeletePaymentHandlerTests.cs | F6.AC4 | Handler tests pass with mocked repositories. |
+| F6.T5 | Balances include payments | server/Features/Balances/Shared/BalanceCalculator.cs (change), tests/Application.Tests/Balances/BalanceCalculatorPaymentsTests.cs | F6.AC12 | Calculator test passes with a payment. |
+| F6.T6 | Read model: suggestions and Paid list | server/Features/Settlements/GetSettlements/GetSettlementsQuery.cs, server/Features/Settlements/GetSettlements/GetSettlementsHandler.cs, server/Features/Settlements/GetSettlements/GetSettlementsEndpoint.cs, tests/Application.Tests/Settlements/GetSettlementsHandlerTests.cs | F6.AC9, F6.AC14, F6.AC16 | Handler tests pass (order, row content, recalculation). |
+| F6.T7 | Payment removal check | server/Features/People/RemovalRules/PaymentReferenceCheck.cs, tests/Application.Tests/People/PaymentReferenceCheckTests.cs | F6.AC10 | Test passes with a mocked payment lookup. |
+| F6.T8 | Ownership checks on settlement requests | server/Features/Settlements/SettlementsAccessFilter.cs, tests/Application.Tests/Settlements/SettlementsAccessFilterTests.cs | F6.AC11 | Guard test passes. |
+| F6.T9 | Settle-up screen and confirmations | client/src/features/settlements/components/SuggestedPayments.tsx, client/src/features/settlements/components/PaidList.tsx, client/src/features/settlements/components/PaymentDialogs.tsx, client/src/tests/settlements/SettleUp.test.tsx | F6.AC1, F6.AC2, F6.AC4 (cancel), F6.AC6, F6.AC9 (rows), F6.AC13 (review), F6.AC14 | Component tests pass. |
 
 ## Test plan
 | AC | Unit test | Or code review (reason) |

@@ -62,13 +62,16 @@ Endpoints: `GET /api/trips`, `POST /api/trips`, `GET /api/trips/{tripId}`, `DELE
 
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F2.T1 | Trips table and migration | server/Persistence, migration | F2.AC12 (storage of deleted rows) | Migration applies to an empty database. Needs approval (migration). |
-| F2.T2 | Trip name validator | server/Features/Trips/CreateTrip/ | F2.AC2, F2.AC3 | `dotnet test --filter "FullyQualifiedName~F2_AC2|F2_AC3"` passes. |
-| F2.T3 | Create trip use case | server/Features/Trips/CreateTrip/ | F2.AC1, F2.AC4 | Create tests pass; duplicate names both saved in the unit test with a mocked repository. |
-| F2.T4 | List trips use case | server/Features/Trips/ListTrips/ | F2.AC5, F2.AC6, F2.AC11 | List tests pass with a mocked repository (owner filter, order, empty). |
-| F2.T5 | Delete trip use case and cascade | server/Features/Trips/DeleteTrip/, TripDeletion/ | F2.AC7, F2.AC12 | Delete tests pass with mocked services; cascade verified in code review. |
-| F2.T6 | Ownership and session checks on trip requests | server/Features/Trips/ | F2.AC9, F2.AC10 | Guard tests pass: non-owner gets not-found, no session gets 401. |
-| F2.T7 | Trip list, new trip form and delete dialog | client/src/features/trips/ | F2.AC1, F2.AC2, F2.AC3, F2.AC8, F2.AC11, F2.AC13 | Component tests pass. |
+| Task | Title | Files | ACs covered | Done when |
+|---|---|---|---|---|
+| F2.T1 | Trip entity configuration and migration | server/Persistence/Configurations/TripConfiguration.cs, server/Persistence/Migrations/<timestamp>_AddTrips.cs | F2.AC12 (storage) | Migration applies to an empty database. Needs approval (migration). |
+| F2.T2 | Trip name validator | server/Features/Trips/CreateTrip/CreateTripValidator.cs, tests/Application.Tests/Trips/CreateTripValidatorTests.cs | F2.AC2, F2.AC3 | `dotnet test --filter "FullyQualifiedName~F2_AC2|F2_AC3"` passes. |
+| F2.T3 | Create trip use case | server/Features/Trips/CreateTrip/CreateTripCommand.cs, server/Features/Trips/CreateTrip/CreateTripHandler.cs, server/Features/Trips/CreateTrip/CreateTripEndpoint.cs, server/Features/Trips/CreateTrip/CreateTripResponse.cs, tests/Application.Tests/Trips/CreateTripHandlerTests.cs | F2.AC1, F2.AC4, F2.AC13 | Create tests pass with a mocked repository. |
+| F2.T4 | List trips use case | server/Features/Trips/ListTrips/ListTripsQuery.cs, server/Features/Trips/ListTrips/ListTripsHandler.cs, server/Features/Trips/ListTrips/ListTripsEndpoint.cs, server/Features/Trips/ListTrips/ListTripsResponse.cs, tests/Application.Tests/Trips/ListTripsHandlerTests.cs | F2.AC5, F2.AC6, F2.AC11 | List tests pass (owner filter, order, empty). |
+| F2.T5 | Delete trip use case | server/Features/Trips/DeleteTrip/DeleteTripCommand.cs, server/Features/Trips/DeleteTrip/DeleteTripHandler.cs, server/Features/Trips/DeleteTrip/DeleteTripEndpoint.cs, tests/Application.Tests/Trips/DeleteTripHandlerTests.cs | F2.AC7, F2.AC12 | Delete tests pass with mocked services. |
+| F2.T6 | Cascade service | server/Features/Trips/TripDeletion/TripDeletionService.cs, server/Features/Trips/TripDeletion/ITripDeletionService.cs, tests/Application.Tests/Trips/TripDeletionServiceTests.cs | F2.AC7 | Cascade calls are tested; the database cascade is in code review. |
+| F2.T7 | Ownership and session checks on trip requests | server/Features/Trips/TripAccessFilter.cs, tests/Application.Tests/Trips/TripAccessFilterTests.cs | F2.AC9, F2.AC10 | Guard tests pass: non-owner gets not-found, no session gets 401. |
+| F2.T8 | Trip list, new trip form and delete dialog | client/src/features/trips/components/TripList.tsx, client/src/features/trips/components/NewTripForm.tsx, client/src/features/trips/components/DeleteTripDialog.tsx, client/src/features/trips/schemas/tripSchemas.ts, client/src/tests/trips/TripScreens.test.tsx | F2.AC1, F2.AC2, F2.AC3, F2.AC8, F2.AC11, F2.AC13 | Component tests pass. |
 
 ## Test plan
 | AC | Unit test | Or code review (reason) |

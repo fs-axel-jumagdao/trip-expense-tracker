@@ -55,12 +55,14 @@ Endpoint: `GET /api/trips/{tripId}/balances`.
 
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F5.T1 | Balance calculator | server/Features/Balances/Shared/ | F5.AC1, F5.AC5, F5.AC7, F5.AC9 | Calculator tests pass, including worked example 1. |
-| F5.T2 | Label and two-decimal formatter | server/Features/Balances/Shared/ | F5.AC2, F5.AC3, F5.AC4, F5.AC11 | Formatter tests pass. |
-| F5.T3 | Row order | server/Features/Balances/GetBalances/ | F5.AC6 | Order test passes. |
-| F5.T4 | Mismatch check and warning | server/Features/Balances/GetBalances/ | F5.AC8 | Test passes with a mocked logger, checking no names or amounts are logged. |
-| F5.T5 | Get balances request and ownership | server/Features/Balances/GetBalances/ | F5.AC10, F5.AC12 | Handler and guard tests pass. |
-| F5.T6 | Balances component | client/src/features/balances/ | F5.AC2 to F5.AC6 (as text and order) | Component tests pass. |
+| Task | Title | Files | ACs covered | Done when |
+|---|---|---|---|---|
+| F5.T1 | Balance calculator | server/Features/Balances/Shared/BalanceCalculator.cs, tests/Application.Tests/Balances/BalanceCalculatorTests.cs | F5.AC1, F5.AC5, F5.AC7, F5.AC9 | Calculator tests pass, including worked example 1. |
+| F5.T2 | Label and two-decimal formatter | server/Features/Balances/Shared/BalanceFormatter.cs, tests/Application.Tests/Balances/BalanceFormatterTests.cs | F5.AC2, F5.AC3, F5.AC4, F5.AC11 | Formatter tests pass. |
+| F5.T3 | Get balances use case | server/Features/Balances/GetBalances/GetBalancesQuery.cs, server/Features/Balances/GetBalances/GetBalancesHandler.cs, server/Features/Balances/GetBalances/GetBalancesEndpoint.cs, tests/Application.Tests/Balances/GetBalancesHandlerTests.cs | F5.AC6, F5.AC10 | Order and ownership tests pass. |
+| F5.T4 | Mismatch check and warning | server/Features/Balances/GetBalances/MismatchChecker.cs, tests/Application.Tests/Balances/MismatchCheckerTests.cs | F5.AC8 | Test passes with a mocked logger, checking no names or amounts are logged. |
+| F5.T5 | No balance storage | server/Persistence (review only) | F5.AC12 | Schema review: no balance table or column. |
+| F5.T6 | Balances component | client/src/features/balances/components/BalancesList.tsx, client/src/features/balances/api/balancesApi.ts, client/src/tests/balances/BalancesList.test.tsx | F5.AC2 to F5.AC6 (as text and order) | Component tests pass. |
 
 ## Test plan
 | AC | Unit test | Or code review (reason) |

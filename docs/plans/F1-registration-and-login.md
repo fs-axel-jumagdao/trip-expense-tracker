@@ -71,14 +71,20 @@ Existing code to reuse: none. The repo has no application code yet, so these pat
 
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F1.T1 | Users and Sessions tables and migration | server/Persistence, migration | F1.AC4 (storage), F1.AC5 (hash stored), F1.AC7 (sessions) | Migration applies to an empty database and `dotnet build` passes. Needs approval (migration). |
-| F1.T2 | Email normaliser and password rule | server/Features/Auth/Register/, server/Common/Auth/ | F1.AC2, F1.AC3, F1.AC12 | `dotnet test --filter "FullyQualifiedName~F1_AC2|F1_AC3|F1_AC12"` passes. |
-| F1.T3 | Password hashing | server/Infrastructure/ | F1.AC5 | Unit tests pass for the hash test cases. |
-| F1.T4 | Register use case | server/Features/Auth/Register/ | F1.AC1, F1.AC4, F1.AC5 (response) | Register tests pass; duplicate returns the duplicate error. |
-| F1.T5 | Login and logout use cases | server/Features/Auth/Login/, Logout/ | F1.AC6, F1.AC7, F1.AC12 | Login and logout tests pass. |
-| F1.T6 | Session expiry and the session guard | server/Common/Auth/ | F1.AC8, F1.AC9 | Expiry and guard tests pass. Needs approval (authentication). |
-| F1.T7 | Ownership helper for trip requests | server/Common/Auth/ | F1.AC11 | Ownership test returns not-found for another user's trip. |
-| F1.T8 | Register and log-in screens, redirect | client/src/features/auth/, client/src/routes/ | F1.AC1, F1.AC6 (messages), F1.AC10 | `npm run test -- --run` passes for the component tests. |
+| Task | Title | Files | ACs covered | Done when |
+|---|---|---|---|---|
+| F1.T1 | Users and Sessions entity configuration | server/Persistence/Configurations/UserConfiguration.cs, server/Persistence/Configurations/SessionConfiguration.cs, server/Persistence/AppDbContext.cs | F1.AC4, F1.AC5, F1.AC7 (storage) | Both configurations compile and `dotnet build` passes. |
+| F1.T2 | Migration | server/Persistence/Migrations/<timestamp>_AddUsersAndSessions.cs | F1.AC4 (storage) | Migration applies to an empty database. Needs approval (migration). |
+| F1.T3 | Email normaliser and password rule | server/Features/Auth/Register/EmailNormaliser.cs, server/Features/Auth/Register/RegisterValidator.cs, tests/Application.Tests/Auth/EmailNormaliserTests.cs, tests/Application.Tests/Auth/RegisterValidatorTests.cs | F1.AC2, F1.AC3, F1.AC12 | `dotnet test --filter "FullyQualifiedName~F1_AC2|F1_AC3|F1_AC12"` passes. |
+| F1.T4 | Password hashing | server/Infrastructure/PasswordHasherService.cs, server/Infrastructure/IPasswordHasherService.cs, tests/Application.Tests/Auth/PasswordHasherTests.cs | F1.AC5 | Hash tests pass. |
+| F1.T5 | Register use case | server/Features/Auth/Register/RegisterCommand.cs, server/Features/Auth/Register/RegisterHandler.cs, server/Features/Auth/Register/RegisterEndpoint.cs, server/Features/Auth/Register/RegisterResponse.cs, tests/Application.Tests/Auth/RegisterHandlerTests.cs | F1.AC1, F1.AC4, F1.AC5 (response) | Register tests pass; duplicate returns the duplicate error. |
+| F1.T6 | Login use case | server/Features/Auth/Login/LoginCommand.cs, server/Features/Auth/Login/LoginHandler.cs, server/Features/Auth/Login/LoginEndpoint.cs, tests/Application.Tests/Auth/LoginHandlerTests.cs | F1.AC6, F1.AC12 | Login tests pass. |
+| F1.T7 | Logout use case | server/Features/Auth/Logout/LogoutCommand.cs, server/Features/Auth/Logout/LogoutHandler.cs, server/Features/Auth/Logout/LogoutEndpoint.cs, tests/Application.Tests/Auth/LogoutHandlerTests.cs | F1.AC7 | Logout tests pass. |
+| F1.T8 | Session expiry rule | server/Common/Auth/SessionExpiryRule.cs, server/Common/Auth/IClock.cs, tests/Application.Tests/Auth/SessionExpiryRuleTests.cs | F1.AC8 | Expiry tests pass with an injected clock. |
+| F1.T9 | Session guard | server/Common/Auth/SessionGuardFilter.cs, tests/Application.Tests/Auth/SessionGuardFilterTests.cs | F1.AC9 | Guard tests pass. Needs approval (authentication). |
+| F1.T10 | Ownership helper for trip requests | server/Common/Auth/TripOwnershipHelper.cs, tests/Application.Tests/Auth/TripOwnershipHelperTests.cs | F1.AC11 | Ownership test returns not-found for another user's trip. |
+| F1.T11 | Register and log-in forms | client/src/features/auth/components/RegisterForm.tsx, client/src/features/auth/components/LoginForm.tsx, client/src/features/auth/schemas/authSchemas.ts, client/src/features/auth/api/authApi.ts, client/src/tests/auth/AuthForms.test.tsx | F1.AC1, F1.AC6 (messages) | `npm run test -- --run` passes for the form tests. |
+| F1.T12 | Redirect for logged-out visitors | client/src/routes/RequireAuth.tsx, client/src/routes/AppRoutes.tsx, client/src/tests/auth/RequireAuth.test.tsx | F1.AC9 (401 leads to log in), F1.AC10 | Component tests pass; full redirect in code review. |
 
 Done-when for the whole feature: `npm run test -- --run`, `dotnet test`, `npm run lint` and `npm run build` all pass, and the code-review items below are checked.
 

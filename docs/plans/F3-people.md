@@ -61,13 +61,16 @@ Endpoints: `GET /api/trips/{tripId}/people`, `POST /api/trips/{tripId}/people`, 
 
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F3.T1 | People table, unique index and migration | server/Persistence, migration | F3.AC4 (storage) | Migration applies to an empty database. Needs approval (migration). |
-| F3.T2 | Name rules: trim, length 1 to 50, normalise | server/Features/People/AddPerson/ | F3.AC2, F3.AC3, F3.AC4 (part) | Validator tests pass. |
-| F3.T3 | Add person use case | server/Features/People/AddPerson/ | F3.AC1, F3.AC4, F3.AC11 | Handler tests pass with a mocked repository. |
-| F3.T4 | Removal rules and remove person use case | server/Features/People/RemovePerson/, RemovalRules/ | F3.AC5, F3.AC6, F3.AC7, F3.AC8 | Remove tests pass with mocked blockers. The payment blocker is a stub until F6 (see Risks). |
-| F3.T5 | People list order | server/Features/People/ListPeople/ | F3.AC9 | Ordering test passes. |
-| F3.T6 | Ownership checks on people requests | server/Features/People/ | F3.AC10 | Guard test passes: non-owner gets not-found. |
-| F3.T7 | People section and blocked-removal dialog | client/src/features/people/ | F3.AC1, F3.AC2, F3.AC3, F3.AC11 (empty text), F3.AC12 (no rename control, code review) | Component tests pass. |
+| Task | Title | Files | ACs covered | Done when |
+|---|---|---|---|---|
+| F3.T1 | People entity configuration and migration | server/Persistence/Configurations/PersonConfiguration.cs, server/Persistence/Migrations/<timestamp>_AddPeople.cs | F3.AC4 (storage) | Migration applies to an empty database. Needs approval (migration). |
+| F3.T2 | Name rules: trim, length 1 to 50, normalise | server/Features/People/AddPerson/AddPersonValidator.cs, server/Features/People/AddPerson/PersonNameRules.cs, tests/Application.Tests/People/PersonNameRulesTests.cs | F3.AC2, F3.AC3, F3.AC4 (part) | Validator tests pass. |
+| F3.T3 | Add person use case | server/Features/People/AddPerson/AddPersonCommand.cs, server/Features/People/AddPerson/AddPersonHandler.cs, server/Features/People/AddPerson/AddPersonEndpoint.cs, tests/Application.Tests/People/AddPersonHandlerTests.cs | F3.AC1, F3.AC4, F3.AC11 | Handler tests pass with a mocked repository. |
+| F3.T4 | Removal check interface | server/Features/People/RemovalRules/IPersonReferenceCheck.cs, server/Features/People/RemovalRules/PersonReferenceResult.cs, server/Features/People/RemovalRules/PaymentReferenceCheckStub.cs | F3.AC8 (interface; payment part stubbed until F6) | Interface and stub compile; stub returns "none" until F6. |
+| F3.T5 | Remove person use case | server/Features/People/RemovePerson/RemovePersonCommand.cs, server/Features/People/RemovePerson/RemovePersonHandler.cs, server/Features/People/RemovePerson/RemovePersonEndpoint.cs, tests/Application.Tests/People/RemovePersonHandlerTests.cs | F3.AC5, F3.AC6, F3.AC7, F3.AC8 | Remove tests pass with mocked blockers. |
+| F3.T6 | People list order | server/Features/People/ListPeople/ListPeopleQuery.cs, server/Features/People/ListPeople/ListPeopleHandler.cs, tests/Application.Tests/People/ListPeopleHandlerTests.cs | F3.AC9 | Ordering test passes. |
+| F3.T7 | Ownership checks on people requests | server/Features/People/PeopleAccessFilter.cs, tests/Application.Tests/People/PeopleAccessFilterTests.cs | F3.AC10 | Guard test passes: non-owner gets not-found. |
+| F3.T8 | People section and blocked-removal dialog | client/src/features/people/components/PeopleSection.tsx, client/src/features/people/components/AddPersonForm.tsx, client/src/features/people/components/BlockedRemovalDialog.tsx, client/src/features/people/schemas/personSchemas.ts, client/src/tests/people/PeopleSection.test.tsx | F3.AC1, F3.AC2, F3.AC3, F3.AC11, F3.AC12 (review) | Component tests pass; no rename control in review. |
 
 ## Test plan
 | AC | Unit test | Or code review (reason) |
