@@ -32,6 +32,16 @@ The trip shows each person's balance: owed, owes or settled, in add order, alway
 - **Mismatch check** runs on every calculation. If the total is not zero, it logs a warning with the trip ID and the total, and still returns the balances (F5.R8).
 - **No table.** Balances are computed on request (F5.R7).
 
+## Data model, endpoints and technical choices
+Data model: none stored. Balances are computed per request from `Expenses`, `ExpenseShares` and, after F6, `Payments` (F5.AC12).
+
+Endpoint: `GET /api/trips/{tripId}/balances`.
+
+| Choice | Status | Source |
+|---|---|---|
+| Pure calculator, no balance table | Proposed | Spec F5.R7 |
+| Mismatch warning through the project logger, with IDs and totals only | Decided | Project rules (logging) |
+
 ## Files
 | Path | Create / change | Purpose |
 |---|---|---|
@@ -49,7 +59,7 @@ The trip shows each person's balance: owed, owes or settled, in add order, alway
 | F5.T2 | Label and two-decimal formatter | server/Features/Balances/Shared/ | F5.AC2, F5.AC3, F5.AC4, F5.AC11 | Formatter tests pass. |
 | F5.T3 | Row order | server/Features/Balances/GetBalances/ | F5.AC6 | Order test passes. |
 | F5.T4 | Mismatch check and warning | server/Features/Balances/GetBalances/ | F5.AC8 | Test passes with a mocked logger, checking no names or amounts are logged. |
-| F5.T5 | Get balances request and ownership | server/Features/Balances/GetBalances/ | F5.AC10 | Handler and guard tests pass. |
+| F5.T5 | Get balances request and ownership | server/Features/Balances/GetBalances/ | F5.AC10, F5.AC12 | Handler and guard tests pass. |
 | F5.T6 | Balances component | client/src/features/balances/ | F5.AC2 to F5.AC6 (as text and order) | Component tests pass. |
 
 ## Test plan
@@ -66,6 +76,7 @@ The trip shows each person's balance: owed, owes or settled, in add order, alway
 | F5.AC9 | F5.AC9 balances change after deleting an expense (calculator, recalculated) | Full app: balances after a real delete |
 | F5.AC10 | F5.AC10 non-owner gets not-found (ownership guard, mocked owner) | Full app end to end |
 | F5.AC11 | F5.AC11 every amount has two decimals (formatter) | |
+| F5.AC12 | | No balance table or column exists; balances are computed per request (schema reviewed) |
 
 Frontend component tests: F5.AC2 to F5.AC5 as visible text, F5.AC6 in order.
 

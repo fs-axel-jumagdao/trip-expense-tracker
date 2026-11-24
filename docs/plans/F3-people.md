@@ -34,6 +34,18 @@ Users add people to a trip by name and remove them. A person who appears in any 
 - The removal check asks two questions through interfaces: expenses (F4) and payments (F6). F3 ships with an expenses check and a payments check that returns "none", and F6 replaces it. This keeps F3 buildable before F4 and F6 exist, but the expense check cannot be finished until F4 exists. See Risks.
 - The uniqueness rule is enforced by a unique index on (TripId, NormalizedName) (code review) and by the handler (unit tested).
 
+## Data model, endpoints and technical choices
+Data model:
+- `People`: Id, TripId, Name (1 to 50 characters, trimmed), NormalizedName (lowercased, unique with TripId), CreatedAt, CreatedBy, UpdatedAt (null), UpdatedBy (null).
+
+Endpoints: `GET /api/trips/{tripId}/people`, `POST /api/trips/{tripId}/people`, `DELETE /api/trips/{tripId}/people/{personId}`.
+
+| Choice | Status | Source |
+|---|---|---|
+| Unique index on (TripId, NormalizedName) | Proposed | Enforces F3.R3 in storage |
+| `IPersonReferenceCheck` interface for the removal check | Proposed | Lets F4 and F6 plug in |
+| EF Core, MediatR, FluentValidation | Decided | CLAUDE.md |
+
 ## Files
 | Path | Create / change | Purpose |
 |---|---|---|

@@ -1,6 +1,6 @@
 # F5 — Balances
 
-_Status: Approved · Last updated: 2026-11-24 · Source: product.md Goals, Key terms (Balance), Business rules R4 and R5, worked examples 1 and 3, MVP scope row F5_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Goals, Key terms (Balance), Business rules R4 and R5, worked examples 1 and 3, MVP scope row F5_
 
 ## Summary
 The trip shows each person's balance: how much they are owed, or how much they owe, after all expenses and payments. Balances are worked out from the saved expenses, so they are always current and always add up to exactly zero. This is the number the settle-up step (F6) works from.
@@ -86,6 +86,7 @@ Screen names: Trip page (balances section). No mock screens exist yet in `docs/d
 - **F5.AC9** Given an expense is deleted, when the balances are next shown, then they reflect the deletion.
 - **F5.AC10** Given user A and a trip owned by user B, when user A requests the balances, then the response is 404 and no balance is returned.
 - **F5.AC11** Given any balance, when it is shown, then the amount has exactly two decimal places (for example 40 is shown as 40.00).
+- **F5.AC12** Given any trip, when its balances are requested, then they are worked out again from the current expenses and shares, and no balance is saved with the trip.
 
 ## Dependencies
 - **Depends on:** F1 (login and ownership checks), F2 (trips), F3 (people), F4 (expenses and shares).
@@ -107,6 +108,7 @@ Code review only (need a real database or the full running app):
 - **AC9 end to end:** the balances change after a real expense is deleted.
 - **AC7 with real data:** a query over the saved expenses and shares for a trip sums to zero.
 - **AC10 end to end:** full app returns 404 for another user's trip.
+- **AC12 (nothing stored):** no balance table or column exists in the schema; balances are computed per request (code review of the schema).
 
 ## Open questions
 None.
@@ -119,3 +121,4 @@ None.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
 - 2026-11-24: Show the balance mismatch warning to the user as well as the log? → Log only (F5.AC8).
 - 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
+- 2026-11-24: Grader feedback: F5.R7 had no acceptance criterion → Added F5.AC12. Status set back to Draft until re-approved.

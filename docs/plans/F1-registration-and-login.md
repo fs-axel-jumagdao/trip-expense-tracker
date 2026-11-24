@@ -37,6 +37,20 @@ Registration, login and logout, with hashed passwords, a 7-day session that logo
 - **One guard** (`RequireSessionFilter` plus an ownership helper in `server/Common/Auth/`) is the only way trip requests check the session and the owner (F1.R10, F1.R11). F2 to F6 reuse it.
 - **Frontend** keeps the destination URL in the redirect after login (F1.AC10), and shows the error messages from the spec.
 
+## Data model, endpoints and technical choices
+Data model:
+- `Users`: Id, Email (normalised, unique), PasswordHash, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy.
+- `Sessions`: Id, UserId, TokenHash, ExpiresAt, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy.
+
+Endpoints: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`. Every trip request goes through the session guard (F1.T6).
+
+| Choice | Status | Source |
+|---|---|---|
+| Server-side session table, token stored as a hash | Proposed, needs approval | Departs from CLAUDE.md's JWT settings (see Risks) |
+| `PasswordHasher<T>` from ASP.NET Core | Proposed | Built into .NET; no extra dependency |
+| EF Core, MediatR, FluentValidation | Decided | CLAUDE.md |
+| React Hook Form, Zod, Axios, TanStack Query | Decided | CLAUDE.md |
+
 ## Files
 | Path | Create / change | Purpose |
 |---|---|---|

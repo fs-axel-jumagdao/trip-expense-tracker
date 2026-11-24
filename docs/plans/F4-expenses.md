@@ -34,6 +34,20 @@ A user records a shared cost with a description, an amount, a payer and the part
 - **Add** validates the description, payer and participants, checks every person is on the trip, computes shares, and writes the expense and shares in one transaction.
 - **Balances (F5)** read the saved shares; F4 never recalculates them later (F4.R8).
 
+## Data model, endpoints and technical choices
+Data model:
+- `Expenses`: Id, TripId, Description (1 to 200 characters, trimmed), AmountCents (greater than 0), PayerPersonId, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy.
+- `ExpenseShares`: Id, ExpenseId, PersonId (unique with ExpenseId), ShareCents (0 or more), CreatedAt, CreatedBy, UpdatedAt, UpdatedBy.
+
+Endpoints: `GET /api/trips/{tripId}/expenses`, `POST /api/trips/{tripId}/expenses`, `DELETE /api/trips/{tripId}/expenses/{expenseId}`.
+
+| Choice | Status | Source |
+|---|---|---|
+| Whole cents in storage, decimal strings in the API | Decided | Project rules (money) |
+| Typed extra decimals rounded half up | Decided | User decision, F4.AC14 |
+| Shares rounded down, leftover cents in add order | Decided | Spec F4.R7 |
+| EF Core, MediatR, FluentValidation | Decided | CLAUDE.md |
+
 ## Files
 | Path | Create / change | Purpose |
 |---|---|---|
@@ -56,7 +70,7 @@ A user records a shared cost with a description, an amount, a payer and the part
 | F4.T2 | Amount parser with half-up rounding | server/Features/Expenses/Shared/ | F4.AC2, F4.AC14 | `dotnet test --filter "FullyQualifiedName~F4_AC2|F4_AC14"` passes. |
 | F4.T3 | Split calculator | server/Features/Expenses/Shared/ | F4.AC1, F4.AC6, F4.AC7, F4.AC8 | Split tests pass, including sampled amounts. |
 | F4.T4 | Description validator | server/Features/Expenses/AddExpense/ | F4.AC3 | Validator tests pass. |
-| F4.T5 | Add expense use case | server/Features/Expenses/AddExpense/ | F4.AC1, F4.AC4, F4.AC5, F4.AC6, F4.AC9, F4.AC15 | Handler tests pass with mocked repositories and a mocked transaction. |
+| F4.T5 | Add expense use case | server/Features/Expenses/AddExpense/ | F4.AC1, F4.AC4, F4.AC5, F4.AC6, F4.AC9, F4.AC15, F4.AC16 | Handler tests pass with mocked repositories and a mocked transaction. |
 | F4.T6 | List and delete expense use cases | server/Features/Expenses/ListExpenses/, DeleteExpense/ | F4.AC10, F4.AC11 | Tests pass with mocked repositories. |
 | F4.T7 | Ownership checks on expense requests | server/Features/Expenses/ | F4.AC12 | Guard test passes. |
 | F4.T8 | Add expense form, list and delete dialog | client/src/features/expenses/ | F4.AC13, F4.AC15, F4.AC11 (cancel) | Component tests pass. |
@@ -79,6 +93,7 @@ A user records a shared cost with a description, an amount, a payer and the part
 | F4.AC13 | | Component test: all people selected, no payer selected |
 | F4.AC14 | F4.AC14 10.005 is stored as 1001 cents, i.e. 10.01 (amount parser) | |
 | F4.AC15 | | Component test: fields clear and the form stays open |
+| F4.AC16 | F4.AC16 balances read the saved shares and do not recompute them (calculator, saved input) | |
 
 Frontend component tests: F4.AC11 (cancel keeps the expense), F4.AC13 (defaults), F4.AC15 (form clears).
 

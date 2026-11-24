@@ -34,6 +34,18 @@ Users create named trips, see their own trips newest first, and delete a trip af
 - Delete runs in one transaction. The cascade removes rows that F3 to F6 own, through a single `TripDeletion` service that F3 to F6 register their deletes with. This keeps the cascade in one place.
 - Create returns the new trip, and the frontend opens the trip page straight away (F2.R5).
 
+## Data model, endpoints and technical choices
+Data model:
+- `Trips`: Id, Name (1 to 100 characters, trimmed), OwnerUserId, CreatedAt, CreatedBy, UpdatedAt (null), UpdatedBy (null). Only these fields; no others (F2.AC13).
+
+Endpoints: `GET /api/trips`, `POST /api/trips`, `GET /api/trips/{tripId}`, `DELETE /api/trips/{tripId}`.
+
+| Choice | Status | Source |
+|---|---|---|
+| EF Core, MediatR, FluentValidation | Decided | CLAUDE.md |
+| Delete in one transaction | Decided | Project rules (multi-record writes) |
+| `TripDeletion` service for the cascade | Proposed | Keeps the cascade in one place |
+
 ## Files
 | Path | Create / change | Purpose |
 |---|---|---|
@@ -56,7 +68,7 @@ Users create named trips, see their own trips newest first, and delete a trip af
 | F2.T4 | List trips use case | server/Features/Trips/ListTrips/ | F2.AC5, F2.AC6, F2.AC11 | List tests pass with a mocked repository (owner filter, order, empty). |
 | F2.T5 | Delete trip use case and cascade | server/Features/Trips/DeleteTrip/, TripDeletion/ | F2.AC7, F2.AC12 | Delete tests pass with mocked services; cascade verified in code review. |
 | F2.T6 | Ownership and session checks on trip requests | server/Features/Trips/ | F2.AC9, F2.AC10 | Guard tests pass: non-owner gets not-found, no session gets 401. |
-| F2.T7 | Trip list, new trip form and delete dialog | client/src/features/trips/ | F2.AC1, F2.AC2, F2.AC3, F2.AC8, F2.AC11 | Component tests pass. |
+| F2.T7 | Trip list, new trip form and delete dialog | client/src/features/trips/ | F2.AC1, F2.AC2, F2.AC3, F2.AC8, F2.AC11, F2.AC13 | Component tests pass. |
 
 ## Test plan
 | AC | Unit test | Or code review (reason) |
@@ -73,6 +85,7 @@ Users create named trips, see their own trips newest first, and delete a trip af
 | F2.AC10 | F2.AC10 no session gives 401 and does not call the handler (guard, mocked session) | |
 | F2.AC11 | F2.AC11 no trips gives an empty list (handler, mocked repo) | |
 | F2.AC12 | F2.AC12 a deleted trip returns not-found (handler, mocked repo) | Database: the trip row is gone for every user |
+| F2.AC13 | F2.AC13 the saved trip record has only name, owner and creation time (handler, mocked repo) | Form asks only for a name (component test) |
 
 Frontend component tests (Vitest and React Testing Library): F2.AC1 (opens the trip page after create), F2.AC2 and F2.AC3 (messages), F2.AC8 (cancel keeps the trip), F2.AC11 (empty text).
 

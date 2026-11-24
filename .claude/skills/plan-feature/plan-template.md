@@ -39,6 +39,15 @@ Add or remove rows for rules that do not apply, and say why in the row.
 ## Approach
 The recommended approach only, in short paragraphs or a short list. No alternatives unless one was rejected for a reason that matters to the reader.
 
+## Data model, endpoints and technical choices
+Data model: each stored entity with its fields and rules, including the audit fields. Write "none stored" if nothing is saved.
+
+Endpoints: each request the feature adds, by method and path.
+
+| Choice | Status | Source |
+|---|---|---|
+| … | Decided / Proposed / Needs approval | CLAUDE.md, project rules, spec, or user decision |
+
 ## Files
 Critical files to create or change, and existing code to reuse (with paths). For a pattern repeated across many files, describe it once and list a few representative paths.
 

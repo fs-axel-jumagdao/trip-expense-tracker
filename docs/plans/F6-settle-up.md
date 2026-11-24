@@ -33,6 +33,18 @@ The app suggests the fewest payments that bring every balance to zero, the user 
 - **Balances (F5)** receive the payment list as an input, so a recorded payment shifts the balances (F6.R6). This is the payment terms F5 left empty.
 - **Removal rule (F3)** gets its payment implementation here, so people in a payment cannot be removed (F6.R10, F3.AC8).
 
+## Data model, endpoints and technical choices
+Data model:
+- `Payments`: Id, TripId, PayerPersonId, PayeePersonId (different from payer), AmountCents (greater than 0), MarkedAt (UTC), CreatedAt, CreatedBy, UpdatedAt (null), UpdatedBy (null).
+
+Endpoints: `GET /api/trips/{tripId}/settlements`, `POST /api/trips/{tripId}/payments`, `DELETE /api/trips/{tripId}/payments/{paymentId}`.
+
+| Choice | Status | Source |
+|---|---|---|
+| Server recomputes the amount from the current suggestion | Decided | Spec F6.R4 |
+| Mark and delete each in one transaction | Decided | Project rules (multi-record writes) |
+| Suggestions recomputed on each read | Decided | Spec F6.R7, F6.AC16 |
+
 ## Files
 | Path | Create / change | Purpose |
 |---|---|---|
@@ -56,7 +68,7 @@ The app suggests the fewest payments that bring every balance to zero, the user 
 | F6.T3 | Mark as paid use case | server/Features/Settlements/MarkPaid/ | F6.AC3, F6.AC8, F6.AC15 | Handler tests pass with mocked repositories and a mocked transaction. |
 | F6.T4 | Delete payment use case | server/Features/Settlements/DeletePayment/ | F6.AC4 | Handler tests pass with mocked repositories. |
 | F6.T5 | Balances include payments | server/Features/Balances/Shared/ | F6.AC12 | Calculator test passes with a payment. |
-| F6.T6 | Read model: suggestions and Paid list | server/Features/Settlements/GetSettlements/ | F6.AC9, F6.AC14 | Handler tests pass (order and row content). |
+| F6.T6 | Read model: suggestions and Paid list | server/Features/Settlements/GetSettlements/ | F6.AC9, F6.AC14, F6.AC16 | Handler tests pass (order and row content). |
 | F6.T7 | Payment removal check | server/Features/People/RemovalRules/ | F6.AC10 | Test passes with a mocked payment lookup. |
 | F6.T8 | Ownership checks on settlement requests | server/Features/Settlements/ | F6.AC11 | Guard test passes. |
 | F6.T9 | Settle-up screen and confirmations | client/src/features/settlements/ | F6.AC1, F6.AC2, F6.AC4 (cancel), F6.AC6, F6.AC9 (rows), F6.AC14 | Component tests pass. |
@@ -79,6 +91,7 @@ The app suggests the fewest payments that bring every balance to zero, the user 
 | F6.AC13 | | No edit control or request exists (screen and request list reviewed) |
 | F6.AC14 | F6.AC14 newest payment is first (GetSettlements handler) | |
 | F6.AC15 | F6.AC15 a suggestion that changed is refused and nothing is written (MarkPaid handler, mocked repo) | Database: the transaction rolls back on conflict |
+| F6.AC16 | F6.AC16 suggestions are recomputed from the balances after each change (read model, mocked balances) | Full app: suggestions after a real payment or delete |
 
 Frontend component tests: F6.AC1 and F6.AC2 (text), F6.AC4 (cancel keeps the payment), F6.AC6 (all settled text), F6.AC9 and F6.AC14 (rows and order).
 

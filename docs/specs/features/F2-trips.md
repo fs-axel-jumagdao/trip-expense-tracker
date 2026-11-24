@@ -1,6 +1,6 @@
 # F2 — Trips
 
-_Status: Approved · Last updated: 2026-11-24 · Source: product.md Overview, Goals, Roles, Key terms (Trip), Business rules R8, MVP scope row F2_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Overview, Goals, Roles, Key terms (Trip), Business rules R8, MVP scope row F2_
 
 ## Summary
 A user creates a named trip, sees the list of their own trips, and deletes a trip they no longer need. A trip belongs to exactly one user, and nobody else can see it. Trips are the container for people, expenses and payments, so deleting a trip removes everything in it, after the user confirms.
@@ -99,6 +99,7 @@ Each error has a code and a message (see States & errors). A trip that is not th
 - **F2.AC10** Given a logged-out visitor, when they request the trip list, create a trip or delete a trip, then the request is refused with 401 and no trip data is returned.
 - **F2.AC11** Given a user with no trips, when they open the trip list, then the empty state is shown.
 - **F2.AC12** Given a trip deleted by its owner, when any user requests it, then it is treated as not found.
+- **F2.AC13** Given the New trip form, when the user creates a trip, then only a name is asked for, and the saved trip holds only its name, its owner and its creation time.
 
 ## Dependencies
 - **Depends on:** F1 (login and ownership checks, F1.R10 and F1.R11).
@@ -110,11 +111,11 @@ Each error has a code and a message (see States & errors). A trip that is not th
 Unit tests only (project rules). Each test is mapped to its AC IDs.
 
 - **Unit: trip name validator** (trim, 1–100 characters, empty, whitespace). AC2, AC3.
-- **Unit: create-trip handler with a mocked repository.** AC1 (saved with the owner, returns the new trip so the page can open), AC4 (duplicate names are both accepted).
+- **Unit: create-trip handler with a mocked repository.** AC1 (saved with the owner, returns the new trip so the page can open), AC4 (duplicate names are both accepted), AC13 (the saved record has only name, owner and creation time).
 - **Unit: list-trips handler with mocked repository.** AC5 (only the requester's trips are returned), AC6 (newest first), AC11 (no trips gives an empty list).
 - **Unit: delete-trip handler with mocked repositories.** AC7 (confirmed delete removes the trip and calls the removal for its people, expenses and payments), AC8 (cancel is handled in the UI test; the handler is not called on cancel), AC12 (a deleted trip returns not found).
 - **Unit: ownership guard for trip requests with a mocked owner.** AC9 (another user's trip returns not found and nothing changes), AC10 (no session gives 401 without calling the handler).
-- **Unit (frontend): Trip list and New trip form component tests.** AC1 (opens the trip page after create), AC2 and AC3 as visible messages, AC11 (empty state text), AC8 (cancel keeps the trip in the list).
+- **Unit (frontend): Trip list and New trip form component tests.** AC1 (opens the trip page after create), AC2 and AC3 as visible messages, AC11 (empty state text), AC8 (cancel keeps the trip in the list), AC13 (the form asks only for a name).
 
 Code review only (need a real database or the full running app):
 - **AC5 in the query:** the trip list query filters by the owner in the database, and the ownership check is in the query itself.
@@ -132,3 +133,4 @@ None.
 - 2026-11-24: Where does the user go after creating a trip? → Straight to the new trip's page to add people.
 - 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
 - 2026-11-24: Approval → Approved by the user.
+- 2026-11-24: Grader feedback: F2.R8 had no acceptance criterion → Added F2.AC13. Status set back to Draft until re-approved.

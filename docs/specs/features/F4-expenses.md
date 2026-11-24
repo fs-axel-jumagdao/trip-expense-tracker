@@ -1,6 +1,6 @@
 # F4 — Expenses
 
-_Status: Approved · Last updated: 2026-11-24 · Source: product.md Goals, Roles, Key terms, Assumptions, Business rules R1–R3 and R8, worked examples 1–2, MVP scope row F4_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Goals, Roles, Key terms, Assumptions, Business rules R1–R3 and R8, worked examples 1–2, MVP scope row F4_
 
 ## Summary
 A user records a shared cost: what it was, how much, who paid, and who shares it. Each expense is split equally to the cent, and the split is saved with the expense so balances can always be recalculated exactly. The user can delete an expense after confirming, and cannot edit one. Adding an expense should take four inputs (product.md Goals).
@@ -112,6 +112,7 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 - **F4.AC13** Given a trip with Sam, Alex and Jo, when the user opens Add expense, then all three are selected as participants and no payer is selected.
 - **F4.AC14** Given an amount of 10.005, when the expense is saved, then the amount is stored as 10.01.
 - **F4.AC15** Given a successful add, when the form updates, then its fields are cleared and the form stays open.
+- **F4.AC16** Given a saved expense, when balances are calculated, then they use the shares saved with the expense and do not recalculate them.
 
 ## Dependencies
 - **Depends on:** F1 (login and ownership checks), F2 (trips), F3 (people who pay and share).
@@ -127,6 +128,7 @@ Unit tests only (project rules). Each test is mapped to its AC IDs.
 - **Unit: description validator** (trim, 1–200). AC3.
 - **Unit: add-expense handler with mocked repositories.** AC1 (saved with shares), AC4, AC5, AC9 (person not on trip), AC6 (accepted when payer is not a participant).
 - **Unit: expense list ordering.** AC10.
+- **Unit: saved shares are used as-is.** AC16 (the balance input is the saved shares; nothing is recomputed from the amount).
 - **Unit: delete handler.** AC11 (confirmed delete removes expense and its shares; cancel leaves it, covered by the UI step).
 - **Unit: ownership guard for expense requests with a mocked trip owner.** AC12.
 - **Unit (frontend): Add expense form component test.** AC13 (all people selected by default, no payer selected), and the delete confirmation step for AC11 (cancel keeps the expense), and AC15 (fields clear and the form stays open after a successful add).
@@ -150,4 +152,5 @@ None.
 - 2026-11-24: Rounding method for extra decimals? → Round half up (10.005 becomes 10.01).
 - 2026-11-24: What does the form do after an add? → Clears its fields and stays open.
 - 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
+- 2026-11-24: Grader feedback: F4.R8 had no acceptance criterion → Added F4.AC16. Status set back to Draft until re-approved.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
