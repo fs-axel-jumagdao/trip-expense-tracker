@@ -1,6 +1,6 @@
 # F6 — Settle up
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Key terms (Suggested payment, Payment), Business rules R4 and R6, worked examples 1 and 3, Goals, MVP scope row F6_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Key terms (Suggested payment, Payment), Business rules R4 and R6, worked examples 1 and 3, Goals, MVP scope row F6_
 
 ## Summary
 The app proposes the fewest-step set of payments that would bring every balance to zero, and the user records each one as paid once the money has moved outside the app. Recording a payment changes the balances, so the next suggestions are worked out from the new balances. The user can delete a payment if it was recorded by mistake. The step is done when every suggested payment has been marked as paid and every balance is zero.
@@ -146,5 +146,6 @@ None.
 - 2026-11-24: A suggestion that changed before it was marked paid? → Refuse it and show a message; nothing is recorded (F6.AC15).
 - 2026-11-24: Paid list order? → Newest first (F6.R12, F6.AC14).
 - 2026-11-24: Grader feedback: F6.R7 had no acceptance criterion → Added F6.AC16. Status set back to Draft until re-approved.
+- 2026-11-24: Re-approval after adding F6.AC16 → Approved by the user.
 - 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.

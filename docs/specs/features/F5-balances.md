@@ -1,6 +1,6 @@
 # F5 — Balances
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Goals, Key terms (Balance), Business rules R4 and R5, worked examples 1 and 3, MVP scope row F5_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Goals, Key terms (Balance), Business rules R4 and R5, worked examples 1 and 3, MVP scope row F5_
 
 ## Summary
 The trip shows each person's balance: how much they are owed, or how much they owe, after all expenses and payments. Balances are worked out from the saved expenses, so they are always current and always add up to exactly zero. This is the number the settle-up step (F6) works from.
@@ -122,3 +122,4 @@ None.
 - 2026-11-24: Show the balance mismatch warning to the user as well as the log? → Log only (F5.AC8).
 - 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
 - 2026-11-24: Grader feedback: F5.R7 had no acceptance criterion → Added F5.AC12. Status set back to Draft until re-approved.
+- 2026-11-24: Re-approval after adding F5.AC12 → Approved by the user.

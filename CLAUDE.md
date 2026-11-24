@@ -658,6 +658,8 @@ it("submits an expense", async () => {
 
 # Environment Variables
 
+Note (decided 2026-11-24, see docs/plans/F1-registration-and-login.md): login sessions are server-side, so the `Jwt__` settings below are not used for login.
+
 Backend:
 
 ```env

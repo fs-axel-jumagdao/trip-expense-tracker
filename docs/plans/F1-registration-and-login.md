@@ -46,7 +46,7 @@ Endpoints: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/lo
 
 | Choice | Status | Source |
 |---|---|---|
-| Server-side session table, token stored as a hash | Proposed, needs approval | Departs from CLAUDE.md's JWT settings (see Risks) |
+| Server-side session table, token stored as a hash | Decided by the user, 2026-11-24 | Departs from CLAUDE.md's JWT settings; CLAUDE.md now has a note |
 | `PasswordHasher<T>` from ASP.NET Core | Proposed | Built into .NET; no extra dependency |
 | EF Core, MediatR, FluentValidation | Decided | CLAUDE.md |
 | React Hook Form, Zod, Axios, TanStack Query | Decided | CLAUDE.md |
@@ -112,7 +112,7 @@ Unit tests only. Test names include the AC ID.
 - **Database migrations:** the Users and Sessions migration (F1.T1).
 
 ## Risks and conflicts
-- **Conflict: session design vs CLAUDE.md.** CLAUDE.md lists `Jwt__Key`, `Jwt__Issuer` and `Jwt__Audience`. A JWT cannot be revoked on logout (F1.R9) without storing revoked tokens, which makes it stateful anyway. The plan uses a server-side `Sessions` table and does not use the JWT settings. Owner: the user decides. Needed before F1.T5.
+- **Conflict: session design vs CLAUDE.md. Resolved 2026-11-24.** CLAUDE.md lists `Jwt__Key`, `Jwt__Issuer` and `Jwt__Audience`. A JWT cannot be revoked on logout (F1.R9) without storing revoked tokens, which makes it stateful anyway. The user chose server-side sessions. CLAUDE.md now has a note saying the JWT settings are not used for login.
 - **Deviation: audit fields.** Decided 2026-11-24 to follow CLAUDE.md, so `Users` and `Sessions` have all four fields.
 - **Risk: no application code exists yet.** File paths are proposed from CLAUDE.md. They may need adjusting once the project is scaffolded.
 - **Risk: the 401 response on expired sessions.** The frontend must handle 401 by redirecting to Log in. The guard test covers the server side; the redirect is checked in code review.
@@ -121,6 +121,6 @@ Unit tests only. Test names include the AC ID.
 None. Copy and rules are settled in the spec.
 
 ## Decisions log
-- 2026-11-24: Session design → Server-side sessions with logout across all devices, which departs from CLAUDE.md's JWT settings. Needs approval.
+- 2026-11-24: Session design → Server-side sessions with logout across all devices, which departs from CLAUDE.md's JWT settings. Decided by the user.
 - 2026-11-24: Audit fields → All four on every entity (user decision).
 - 2026-11-24: Loading labels with "…" → Finished copy, not placeholders (user decision).

@@ -1,6 +1,6 @@
 # F2 — Trips
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Overview, Goals, Roles, Key terms (Trip), Business rules R8, MVP scope row F2_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Overview, Goals, Roles, Key terms (Trip), Business rules R8, MVP scope row F2_
 
 ## Summary
 A user creates a named trip, sees the list of their own trips, and deletes a trip they no longer need. A trip belongs to exactly one user, and nobody else can see it. Trips are the container for people, expenses and payments, so deleting a trip removes everything in it, after the user confirms.
@@ -134,3 +134,4 @@ None.
 - 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
 - 2026-11-24: Approval → Approved by the user.
 - 2026-11-24: Grader feedback: F2.R8 had no acceptance criterion → Added F2.AC13. Status set back to Draft until re-approved.
+- 2026-11-24: Re-approval after adding F2.AC13 → Approved by the user.
