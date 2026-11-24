@@ -1,6 +1,6 @@
 # F2 — Trips
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Overview, Goals, Roles, Key terms (Trip), Business rules R8, MVP scope row F2_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Overview, Goals, Roles, Key terms (Trip), Business rules R8, MVP scope row F2_
 
 ## Summary
 A user creates a named trip, sees the list of their own trips, and deletes a trip they no longer need. A trip belongs to exactly one user, and nobody else can see it. Trips are the container for people, expenses and payments, so deleting a trip removes everything in it, after the user confirms.
@@ -54,17 +54,17 @@ Screen names: Trip list, New trip form, Trip page (the page F3–F6 add their se
 Each error has a code and a message (see States & errors). A trip that is not the user's is treated as not found.
 
 ## States & errors
-- **Empty trip list:** copy **open**.
+- **Empty trip list:** "You don't have any trips yet. Create one to start tracking spending."
 - **Validation errors** (shown next to the name field):
 
 | Code | Field | Rule | When checked | Copy |
 |---|---|---|---|---|
-| `trip_name_required` | name | Empty after trimming (F2.R1) | Create | open |
-| `trip_name_too_long` | name | More than 100 characters after trimming (F2.R1) | Create | open |
+| `trip_name_required` | name | Empty after trimming (F2.R1) | Create | "Enter a trip name." |
+| `trip_name_too_long` | name | More than 100 characters after trimming (F2.R1) | Create | "Trip names can be up to 100 characters." |
 
-- **Delete confirmation:** title, body and button labels are **open**. The body must say that the trip and everything in it will be removed (F2.R6).
-- **Server error:** copy **open**.
-- **Trip not found** (another user's trip, or a trip already deleted): copy **open**.
+- **Delete confirmation:** title "Delete this trip?"; body "{name} and everything in it will be removed: its people, expenses and payments. This can't be undone."; buttons "Delete trip" and "Cancel" (F2.R6).
+- **Server error:** "Something went wrong. Please try again."
+- **Trip not found** (another user's trip, or a trip already deleted): "This trip couldn't be found. It may have been deleted."
 - **Not logged in:** handled by F1; no new copy.
 
 ## Accessibility
@@ -123,10 +123,12 @@ Code review only (need a real database or the full running app):
 - **AC12 end to end:** a deleted trip cannot be opened by any user.
 
 ## Open questions
-- [ ] Exact wording for: `trip_name_required`, `trip_name_too_long`, the empty trip list, the delete confirmation (title, body and buttons), the trip-not-found message, and the server error. (Standard wording can be proposed as it was for F1 and F3–F6, for your review.)
+None.
 
 ## Decisions log
 - 2026-11-24: Trip name rules? → Trim spaces, required, max 100 characters.
 - 2026-11-24: Can two trips have the same name? → Yes, allowed.
 - 2026-11-24: Trip list order? → Newest first.
 - 2026-11-24: Where does the user go after creating a trip? → Straight to the new trip's page to add people.
+- 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
+- 2026-11-24: Approval → Approved by the user.
