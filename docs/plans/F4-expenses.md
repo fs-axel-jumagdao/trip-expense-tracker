@@ -1,6 +1,6 @@
 # F4 — Expenses: implementation plan
 
-_Status: Draft · Last updated: 2026-11-24 · Spec: docs/specs/features/F4-expenses.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F4-expenses.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -119,3 +119,4 @@ None.
 - 2026-11-24: Amount rounding → half up for typed extra decimals (user decision, F4.AC14).
 - 2026-11-24: Form after add → clears and stays open (user decision, F4.AC15).
 - 2026-11-24: Audit fields → all four on Expenses and ExpenseShares.
+- 2026-11-24: Plan approved by the user, including its migrations.

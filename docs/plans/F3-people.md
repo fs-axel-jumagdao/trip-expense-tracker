@@ -1,6 +1,6 @@
 # F3 — People: implementation plan
 
-_Status: Draft · Last updated: 2026-11-24 · Spec: docs/specs/features/F3-people.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F3-people.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -108,3 +108,4 @@ None.
 ## Decisions log
 - 2026-11-24: Audit fields → All four on People, `UpdatedAt` and `UpdatedBy` null.
 - 2026-11-24: Removal check → an interface with an expense implementation (F4) and a payment implementation (F6), with F3 testing the rule through the interface.
+- 2026-11-24: Plan approved by the user, including its migrations.

@@ -1,6 +1,6 @@
 # F2 — Trips: implementation plan
 
-_Status: Draft · Last updated: 2026-11-24 · Spec: docs/specs/features/F2-trips.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F2-trips.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -112,3 +112,4 @@ None.
 ## Decisions log
 - 2026-11-24: Audit fields on Trips → All four, `UpdatedAt` and `UpdatedBy` left null (user decision on audit fields).
 - 2026-11-24: Cascade → one `TripDeletion` service, so each feature registers its child deletes in one place.
+- 2026-11-24: Plan approved by the user, including its migrations.

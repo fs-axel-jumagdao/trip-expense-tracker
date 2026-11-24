@@ -1,6 +1,6 @@
 # F1 — Registration and login: implementation plan
 
-_Status: Draft · Last updated: 2026-11-24 · Spec: docs/specs/features/F1-registration-and-login.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F1-registration-and-login.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -130,3 +130,4 @@ None. Copy and rules are settled in the spec.
 - 2026-11-24: Session design → Server-side sessions with logout across all devices, which departs from CLAUDE.md's JWT settings. Decided by the user.
 - 2026-11-24: Audit fields → All four on every entity (user decision).
 - 2026-11-24: Loading labels with "…" → Finished copy, not placeholders (user decision).
+- 2026-11-24: Plan approved by the user, including its migrations.

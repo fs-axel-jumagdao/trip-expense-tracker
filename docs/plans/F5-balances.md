@@ -1,6 +1,6 @@
 # F5 — Balances: implementation plan
 
-_Status: Draft · Last updated: 2026-11-24 · Spec: docs/specs/features/F5-balances.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F5-balances.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -99,3 +99,4 @@ None.
 ## Decisions log
 - 2026-11-24: Balances are computed, not stored (F5.R7, from the spec).
 - 2026-11-24: Mismatch → log only (user decision).
+- 2026-11-24: Plan approved by the user, including its migrations.

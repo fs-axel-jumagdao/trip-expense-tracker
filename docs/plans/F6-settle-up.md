@@ -1,6 +1,6 @@
 # F6 — Settle up: implementation plan
 
-_Status: Draft · Last updated: 2026-11-24 · Spec: docs/specs/features/F6-settle-up.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F6-settle-up.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -115,3 +115,4 @@ None.
 - 2026-11-24: Stale suggestion → refuse and show a message; nothing recorded (user decision, F6.AC15).
 - 2026-11-24: Paid list order → newest first (user decision, F6.AC14).
 - 2026-11-24: Audit fields → all four on Payments.
+- 2026-11-24: Plan approved by the user, including its migrations.
