@@ -110,7 +110,6 @@ Code review only (need a real database or the full running app):
 
 ## Open questions
 - [ ] Exact wording for: the empty trip state, the server error, and the loading indicator (if any text is shown).
-- [ ] Should the warning in F5.AC8 be sent to the user as well, for example as a banner? Current spec: log only, as the user chose.
 
 ## Decisions log
 - 2026-11-19: How is a zero balance shown? → "Settled" with 0.00.
@@ -118,3 +117,4 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Show paid and share totals too? → No. Balance only.
 - 2026-11-19: What if balances do not add up to zero? → Show the balances anyway and log a warning.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
+- 2026-11-24: Show the balance mismatch warning to the user as well as the log? → Log only (F5.AC8).

@@ -28,7 +28,7 @@ A user records a shared cost: what it was, how much, who paid, and who shares it
 ## User flow & screens
 1. **Open Add expense.** The form opens with the description and amount empty, no payer selected, and every person on the trip selected as a participant.
 2. **Fill in the form.** The user enters a description, an amount, chooses a payer, and may untick participants who do not share the cost. The payer may be unticked too, since they do not need to be a participant (R2).
-3. **Submit.** The expense is saved and appears at the top of the expense list. The form closes or clears (plan decides), and the trip's balances update (F5).
+3. **Submit.** The expense is saved and appears at the top of the expense list. The form clears its fields and stays open for the next expense, and the trip's balances update (F5).
 4. **Delete.** The user selects Delete on an expense. A confirmation step asks them to confirm. On confirm the expense is removed and the balances update. On cancel nothing changes.
 5. **Empty list.** A trip with no expenses shows the empty state (see States & errors).
 
@@ -36,7 +36,7 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 
 ## Requirements
 - **F4.R1** An expense amount is greater than zero (product.md Business rules R1). Amounts are stored as whole cents, never floating-point (product.md Assumptions).
-- **F4.R2** An amount typed with more than 2 decimal places is rounded to 2 decimal places before it is saved. The rounding method is open (see Open questions).
+- **F4.R2** An amount typed with more than 2 decimal places is rounded half up to 2 decimal places before it is saved (for example 10.005 becomes 10.01).
 - **F4.R3** An expense has a description of 1 to 200 characters after trimming. It is required.
 - **F4.R4** An expense has exactly one payer, chosen from the people on the same trip (product.md Business rules R2). No payer is pre-selected.
 - **F4.R5** An expense has at least one participant, all of them people on the same trip (product.md Business rules R2). When the form opens, every person on the trip is selected.
@@ -46,6 +46,7 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 - **F4.R9** The expense list shows the newest expense first.
 - **F4.R10** An expense can be deleted after the user confirms. Deleting it removes its shares too. An expense cannot be edited.
 - **F4.R11** Adding, listing and deleting expenses require a logged-in user who owns the trip (F1.R10, F1.R11). Other users get a 404.
+- **F4.R12** After a successful add, the form clears its fields and stays open for the next expense.
 
 ## Data & contract
 
@@ -86,7 +87,7 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 ## Edge cases
 - Amount `90` is accepted and stored as 9000 cents. Amount `90.5` is stored as 9050 cents.
 - Amount `0.00` and `-5` are rejected with `amount_not_positive`.
-- Amount `10.005`: rounded to 2 decimals (F4.R2). The rounding method is open.
+- Amount `10.005`: rounded half up to 10.01 (F4.R2).
 - Shares for worked example 2: 10.00 among Sam, Alex and Jo, in that add order, gives 3.34, 3.33, 3.33. Sam gets the extra cent because they were added first.
 - Shares for worked example 1: 90.00 among Sam, Alex and Jo gives 30.00 each; Sam's 90.00 is paid by Sam, who is a participant.
 - Payer not in participants (payer Sam, participants Alex and Jo): accepted (F4.R6).
@@ -109,6 +110,8 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 - **F4.AC11** Given an expense, when the user selects Delete and then confirms, then the expense is removed. When they cancel, then it stays.
 - **F4.AC12** Given user A and a trip owned by user B, when user A adds, lists or deletes an expense on it, then the response is 404 and nothing changes.
 - **F4.AC13** Given a trip with Sam, Alex and Jo, when the user opens Add expense, then all three are selected as participants and no payer is selected.
+- **F4.AC14** Given an amount of 10.005, when the expense is saved, then the amount is stored as 10.01.
+- **F4.AC15** Given a successful add, when the form updates, then its fields are cleared and the form stays open.
 
 ## Dependencies
 - **Depends on:** F1 (login and ownership checks), F2 (trips), F3 (people who pay and share).
@@ -119,14 +122,14 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 ## Test plan
 Unit tests only (project rules). Each test is mapped to its AC IDs.
 
-- **Unit: amount parser and validator.** Decimal string to cents; `0.00` and `-5` rejected; `90` and `90.5` accepted; `amount_not_a_number`. AC2 (part).
+- **Unit: amount parser and validator.** Decimal string to cents; `0.00` and `-5` rejected; `90` and `90.5` accepted; `amount_not_a_number`. AC2 (part), AC14 (10.005 rounds half up to 10.01).
 - **Unit: split calculator** (pure function). AC1 (30.00 each), AC6 (payer not a participant gets no share), AC7 (3.34, 3.33, 3.33), AC8 (sum always equals amount, with several sample amounts and participant counts).
 - **Unit: description validator** (trim, 1–200). AC3.
 - **Unit: add-expense handler with mocked repositories.** AC1 (saved with shares), AC4, AC5, AC9 (person not on trip), AC6 (accepted when payer is not a participant).
 - **Unit: expense list ordering.** AC10.
 - **Unit: delete handler.** AC11 (confirmed delete removes expense and its shares; cancel leaves it, covered by the UI step).
 - **Unit: ownership guard for expense requests with a mocked trip owner.** AC12.
-- **Unit (frontend): Add expense form component test.** AC13 (all people selected by default, no payer selected), and the delete confirmation step for AC11 (cancel keeps the expense).
+- **Unit (frontend): Add expense form component test.** AC13 (all people selected by default, no payer selected), and the delete confirmation step for AC11 (cancel keeps the expense), and AC15 (fields clear and the form stays open after a successful add).
 
 Code review only (need a real database or the full running app):
 - **Cascade on expense delete:** share rows removed with the expense.
@@ -135,9 +138,7 @@ Code review only (need a real database or the full running app):
 - **AC12 end to end:** full app returns 404 for another user's trip.
 
 ## Open questions
-- [ ] How should an amount with more than 2 decimal places be rounded? Options: round half up (10.005 becomes 10.01) or round down (10.005 becomes 10.00). Needed before F4.R2 can be built, and F4.R2 needs an acceptance criterion once this is decided.
 - [ ] Exact wording for: `description_required`, `description_too_long`, `amount_required`, `amount_not_a_number`, `amount_not_positive`, `payer_required`, `participants_required`, `person_not_on_trip`, the empty list, the delete confirmation (text and buttons), and the server error.
-- [ ] After a successful add, does the form close or stay open with the fields cleared? (Affects AC13 and the flow; the plan can decide, but the user should confirm.)
 
 ## Decisions log
 - 2026-11-19: Description rules? → Required, 1 to 200 characters.
@@ -146,4 +147,6 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Delete confirmation? → Yes, confirm before deleting.
 - 2026-11-19: Expense list order? → Newest first.
 - 2026-11-19: Amount with more than 2 decimals? → Round to 2 decimals. The rounding method is still open.
+- 2026-11-24: Rounding method for extra decimals? → Round half up (10.005 becomes 10.01).
+- 2026-11-24: What does the form do after an add? → Clears its fields and stays open.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.

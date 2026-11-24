@@ -1,6 +1,6 @@
 # F1 — Registration and login
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Roles, Assumptions, Goals, MVP scope row F1_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Roles, Assumptions, Goals, MVP scope row F1_
 
 ## Summary
 A visitor creates an account with an email and password, then logs in and out. Every trip belongs to one account, and every trip request checks that the logged-in user owns it. This is the first build step, because nothing else can be safely built without it. Passwords are stored only in hashed form.
@@ -149,3 +149,4 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Approval → Approved by the user (status set to Approved). Copy for the open error messages is still pending, so it is listed under Open questions.
 - 2026-11-24: Grader feedback: F1.R5 had no acceptance criterion → Added F1.AC12. Status set back to Draft until re-approved.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
+- 2026-11-24: Re-approval after adding F1.AC12 → Approved by the user.
