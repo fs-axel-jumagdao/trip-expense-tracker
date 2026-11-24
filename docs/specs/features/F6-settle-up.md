@@ -60,13 +60,13 @@ Screen names: Trip page (settle-up section: Suggested payments, Paid list). No m
 Refused requests: a payer and payee that are the same person (`payer_equals_payee`); a suggestion that changed or no longer exists (`no_matching_suggestion`), in which case nothing is recorded; a trip or person that is not the user's (404). Amounts are shown as text with two decimal places, for example "40.00".
 
 ## States & errors
-- **No suggestions (all settled):** copy **open**. Shown when every balance is zero.
-- **Empty Paid list:** copy **open**.
-- **Mark as paid confirmation:** the confirm step asks the user to confirm marking the payment as paid. The text and the confirm and cancel labels are **open**.
-- **Delete payment confirmation:** the confirm step asks the user to confirm deleting the payment. The text and labels are **open**.
-- **Suggestion no longer matches (`no_matching_suggestion`):** shown when the suggestion changed or disappeared while the user had the page open. Copy **open**.
-- **`payer_equals_payee`:** should never reach the user from the UI, since the form does not allow it. Copy **open** only if it can be shown.
-- **Server error:** copy **open**.
+- **No suggestions (all settled):** "Everyone is settled up. No payments are left to make." Shown when every balance is zero.
+- **Empty Paid list:** "No payments recorded yet."
+- **Mark as paid confirmation:** title "Mark this payment as paid?"; body "{payer} pays {payee} {amount}. This updates everyone's balances."; buttons "Mark as paid" and "Cancel".
+- **Delete payment confirmation:** title "Delete this payment?"; body "{payer} will owe {payee} {amount} again. This updates everyone's balances."; buttons "Delete payment" and "Cancel".
+- **Suggestion no longer matches (`no_matching_suggestion`):** "These payments have changed since you opened this page. Review the updated suggestions and try again."
+- **`payer_equals_payee`:** "A person can't pay themselves." Shown only if the request is sent without going through the form.
+- **Server error:** "Something went wrong. Please try again."
 - **Not logged in or not the owner:** handled by F1; no new copy.
 
 ## Accessibility
@@ -132,7 +132,7 @@ Code review only (need a real database or the full running app):
 - **AC13 (no edit):** no edit control or request exists; code review of the screen and the request list.
 
 ## Open questions
-- [ ] Exact wording for: the all-settled state, the empty Paid list, both confirmation steps (text and buttons), the stale-suggestion message, and the server error.
+None.
 
 ## Decisions log
 - 2026-11-19: Tie-breaking for suggested payments? → Person added to the trip first pays first.
@@ -143,4 +143,5 @@ Code review only (need a real database or the full running app):
 - 2026-11-24: Grader feedback: F6.R9 had no acceptance criterion → Added F6.AC13.
 - 2026-11-24: A suggestion that changed before it was marked paid? → Refuse it and show a message; nothing is recorded (F6.AC15).
 - 2026-11-24: Paid list order? → Newest first (F6.R12, F6.AC14).
+- 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.

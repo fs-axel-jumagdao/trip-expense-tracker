@@ -52,28 +52,28 @@ Screen names: Register, Log in. No mock screens exist yet in `docs/design`; the 
 
 **Sessions:** a session is created at login and lasts 7 days from login. Logout ends it, and logout ends every session of that user (F1.R9).
 
-**Operations:** register, log in, log out, and every trip request. A trip request without a valid session returns no trip data (F1.R10). Each operation returns success or one of the errors listed in States & errors. Each error has a code and a message; the wording of each message is open (see Open questions).
+**Operations:** register, log in, log out, and every trip request. A trip request without a valid session returns no trip data (F1.R10). Each operation returns success or one of the errors listed in States & errors. Each error has a code and a message; the wording is in States & errors.
 
 ## States & errors
-- **Loading:** the submit button is disabled while a request is in flight, and it shows a loading label. Copy for the label: to be set in the plan (no user wording given; treated as implementation detail).
+- **Loading:** the submit button is disabled while a request is in flight, and it shows a loading label. Labels: "Creating account…" on register, "Logging in…" on log in.
 - **Empty:** not applicable; the forms have no list state.
 - **Validation errors** (each shown next to its field and listed in a summary at the top of the form). Checked on the server; the form may also check them early, but the server result is final.
 
 | Code | Field | Rule | When checked | Copy |
 |---|---|---|---|---|
-| `email_required` | email | Empty after trimming | Register, login | open |
-| `email_invalid` | email | Not one `@` with a dot in the domain part | Register | open |
-| `email_taken` | email | Normalised email already exists (F1.R3) | Register | open |
-| `password_required` | password | Empty | Register, login | open |
-| `password_too_short` | password | Fewer than 8 characters (F1.R2) | Register | open |
-| `confirm_required` | confirm password | Empty | Register | open |
-| `confirm_mismatch` | confirm password | Does not exactly match the password | Register | open |
+| `email_required` | email | Empty after trimming | Register, login | "Enter your email address." |
+| `email_invalid` | email | Not one `@` with a dot in the domain part | Register | "Enter an email address, for example name@example.com." |
+| `email_taken` | email | Normalised email already exists (F1.R3) | Register | "An account with this email already exists. Log in instead." |
+| `password_required` | password | Empty | Register, login | "Enter your password." |
+| `password_too_short` | password | Fewer than 8 characters (F1.R2) | Register | "Your password must be at least 8 characters." |
+| `confirm_required` | confirm password | Empty | Register | "Re-enter your password." |
+| `confirm_mismatch` | confirm password | Does not exactly match the password | Register | "The passwords don't match. Check both fields." |
 | `credentials_invalid` | email and password | Unknown email or wrong password (F1.R6) | Login | "Email or password is incorrect" (set) |
 
 Field-level checks run in the order listed. The server returns the first failing code for each field, so one field shows one message at a time.
 - **Login failure:** "Email or password is incorrect" (the user chose this wording). Shown above the form. Password field is cleared.
-- **Server error:** copy **open**. Shown when the request fails for a reason other than the cases above.
-- **Logged-out request:** the user gets a "Not logged in" response. Copy **open** (no screen shows it if the frontend redirects first).
+- **Server error:** "Something went wrong. Please try again." Shown when the request fails for a reason other than the cases above.
+- **Logged-out request:** "Log in to continue." (no screen shows it if the frontend redirects first).
 
 ## Accessibility
 - Every field has a visible label. Placeholder text is not used as a label.
@@ -131,7 +131,7 @@ Code review only (need a real database or the full running app):
 - **AC10 (redirect and return-to-page):** full-app behaviour.
 
 ## Open questions
-- [ ] Exact wording for: email missing or invalid format; password under 8 characters; confirm password does not match; email already registered; server error; logged-out message ("Not logged in" is a placeholder).
+None.
 
 ## Decisions log
 - 2026-11-19: Password rules? → Minimum 8 characters, no other rules.
@@ -150,3 +150,4 @@ Code review only (need a real database or the full running app):
 - 2026-11-24: Grader feedback: F1.R5 had no acceptance criterion → Added F1.AC12. Status set back to Draft until re-approved.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
 - 2026-11-24: Re-approval after adding F1.AC12 → Approved by the user.
+- 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.

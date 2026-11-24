@@ -51,10 +51,10 @@ Screen names: Trip page (balances section). No mock screens exist yet in `docs/d
 **Log entry on mismatch (F5.R8):** a warning is written to the log with the trip and the total that should have been zero. It contains no names, descriptions or per-person amounts.
 
 ## States & errors
-- **Loading:** the balances section shows a loading indicator until the list arrives. Copy: open (no user wording given; treated as an implementation detail for the plan).
-- **Empty trip (no people):** copy **open**.
+- **Loading:** the label "Loading balances…" shows until the list arrives.
+- **Empty trip (no people):** "Add people to this trip to see balances."
 - **Labels:** "is owed", "owes" and "Settled" (set by the user's choice; the wording is fixed).
-- **Server error:** copy **open**.
+- **Server error:** "Something went wrong. Please try again."
 - **Not logged in or not the owner:** handled by F1; no new copy.
 - **Mismatch:** not shown to the user (see F5.R8). The user sees the balances as calculated.
 
@@ -109,7 +109,7 @@ Code review only (need a real database or the full running app):
 - **AC10 end to end:** full app returns 404 for another user's trip.
 
 ## Open questions
-- [ ] Exact wording for: the empty trip state, the server error, and the loading indicator (if any text is shown).
+None.
 
 ## Decisions log
 - 2026-11-19: How is a zero balance shown? → "Settled" with 0.00.
@@ -118,3 +118,4 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: What if balances do not add up to zero? → Show the balances anyway and log a warning.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
 - 2026-11-24: Show the balance mismatch warning to the user as well as the log? → Log only (F5.AC8).
+- 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.

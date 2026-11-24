@@ -51,17 +51,17 @@ Screen names: Trip page (people section). No mock screens exist yet in `docs/des
 **Operations:** add a person; remove a person. A refused removal lists the expenses and payments that block it (F3.R7). Error codes are in States & errors.
 
 ## States & errors
-- **Empty list:** "No people yet" is not agreed. Copy **open**.
+- **Empty list:** "No people yet. Add someone to start splitting costs."
 - **Validation errors** (shown next to the field):
 
 | Code | Field | Rule | When checked | Copy |
 |---|---|---|---|---|
-| `name_required` | name | Empty after trimming | Add | open |
-| `name_too_long` | name | More than 50 characters after trimming (F3.R2) | Add | open |
-| `name_taken` | name | Same name on this trip ignoring case (F3.R3) | Add | open |
+| `name_required` | name | Empty after trimming | Add | "Enter a name." |
+| `name_too_long` | name | More than 50 characters after trimming (F3.R2) | Add | "Names can be up to 50 characters." |
+| `name_taken` | name | Same name on this trip ignoring case (F3.R3) | Add | "Someone on this trip already has this name." |
 
-- **Blocked removal:** the message names each blocking expense or payment (F3.R7). The wording of the message is **open**.
-- **Server error:** copy **open**.
+- **Blocked removal:** "{Name} can't be removed yet. Remove these first: {list}." The list names each blocking expense or payment (F3.R7).
+- **Server error:** "Something went wrong. Please try again."
 - **Not logged in or not the owner:** handled by F1 (F1.R10, F1.R11); no new copy.
 
 ## Accessibility
@@ -120,7 +120,7 @@ Code review only (need a real database or the full running app):
 - **AC12 (no rename):** no edit control or request exists; code review of the screen and the request list.
 
 ## Open questions
-- [ ] Exact wording for: `name_required`, `name_too_long`, `name_taken`, the blocked-removal message, the empty-list state, and the server error.
+None.
 
 ## Decisions log
 - 2026-11-19: Name rules? → Trim spaces, unique within the trip ignoring case, max 50 characters.
@@ -129,3 +129,4 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: What does the user see when a removal is blocked? → A message that names the expense or payment blocking it.
 - 2026-11-24: Grader feedback: F3.R8 had no acceptance criterion → Added F3.AC12.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and constraints → Replaced them with product terms; the plan decides the technical design.
+- 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.

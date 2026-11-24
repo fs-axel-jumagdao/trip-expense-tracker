@@ -57,22 +57,22 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 **Operations:** add an expense (returns the saved expense with each person's share); list the trip's expenses, newest first; delete an expense. Amounts are sent and shown as text with two decimal places, for example "90.00". Each error has a code and a message (see States & errors).
 
 ## States & errors
-- **Empty list:** copy **open**.
+- **Empty list:** "No expenses yet. Add the first one to start tracking spending."
 - **Validation errors** (shown next to the field, and in a summary at the top of the form):
 
 | Code | Field | Rule | When checked | Copy |
 |---|---|---|---|---|
-| `description_required` | description | Empty after trimming (F4.R3) | Add | open |
-| `description_too_long` | description | More than 200 characters after trimming (F4.R3) | Add | open |
-| `amount_required` | amount | Empty | Add | open |
-| `amount_not_a_number` | amount | Not a valid decimal number | Add | open |
-| `amount_not_positive` | amount | Zero or less (F4.R1) | Add | open |
-| `payer_required` | payer | No payer chosen (F4.R4) | Add | open |
-| `participants_required` | participants | No participant chosen (F4.R5) | Add | open |
-| `person_not_on_trip` | payer or participants | A chosen person is not on this trip (F4.R4, F4.R5) | Add (server) | open |
+| `description_required` | description | Empty after trimming (F4.R3) | Add | "Enter a description." |
+| `description_too_long` | description | More than 200 characters after trimming (F4.R3) | Add | "Descriptions can be up to 200 characters." |
+| `amount_required` | amount | Empty | Add | "Enter an amount." |
+| `amount_not_a_number` | amount | Not a valid decimal number | Add | "Enter the amount as a number, such as 12.50." |
+| `amount_not_positive` | amount | Zero or less (F4.R1) | Add | "The amount must be more than zero." |
+| `payer_required` | payer | No payer chosen (F4.R4) | Add | "Choose who paid." |
+| `participants_required` | participants | No participant chosen (F4.R5) | Add | "Choose at least one person to share this expense." |
+| `person_not_on_trip` | payer or participants | A chosen person is not on this trip (F4.R4, F4.R5) | Add (server) | "That person isn't on this trip. Refresh the page and try again." |
 
-- **Delete confirmation:** the confirm step asks the user to confirm deleting the expense. Its wording, and the confirm and cancel labels, are **open**.
-- **Server error:** copy **open**.
+- **Delete confirmation:** title "Delete this expense?"; body "{description} ({amount}) will be removed. This can't be undone."; buttons "Delete expense" and "Cancel".
+- **Server error:** "Something went wrong. Please try again."
 - **Not logged in or not the owner:** handled by F1; no new copy.
 
 ## Accessibility
@@ -138,7 +138,7 @@ Code review only (need a real database or the full running app):
 - **AC12 end to end:** full app returns 404 for another user's trip.
 
 ## Open questions
-- [ ] Exact wording for: `description_required`, `description_too_long`, `amount_required`, `amount_not_a_number`, `amount_not_positive`, `payer_required`, `participants_required`, `person_not_on_trip`, the empty list, the delete confirmation (text and buttons), and the server error.
+None.
 
 ## Decisions log
 - 2026-11-19: Description rules? → Required, 1 to 200 characters.
@@ -149,4 +149,5 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Amount with more than 2 decimals? → Round to 2 decimals. The rounding method is still open.
 - 2026-11-24: Rounding method for extra decimals? → Round half up (10.005 becomes 10.01).
 - 2026-11-24: What does the form do after an add? → Clears its fields and stays open.
+- 2026-11-24: Error and confirmation wording → Standard plain wording proposed by Claude at the user's request. The user to review before build.
 - 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
