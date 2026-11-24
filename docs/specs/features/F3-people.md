@@ -1,6 +1,6 @@
 # F3 — People
 
-_Status: Draft · Last updated: 2026-11-19 · Source: product.md Roles, Key terms, Assumptions, Business rules R2 and R7, MVP scope row F3_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Roles, Key terms, Assumptions, Business rules R2 and R7, MVP scope row F3_
 
 ## Summary
 A user adds the people on one of their trips and removes them again. People are names only. They have no accounts and cannot log in. A person who is part of any expense or payment cannot be removed, so the balances can never lose someone who owes or is owed money.
@@ -21,7 +21,7 @@ A user adds the people on one of their trips and removes them again. People are 
 - Renaming a person. Product.md Assumptions says there is no editing; a mistake is fixed by deleting and adding again.
 - Accounts or logins for people. Product.md Roles: people have no accounts.
 - Editing expenses or payments to change who is involved (covered by F4 and F6, which have no editing either).
-- Sharing a trip with other users (product.md After the core, out of scope).
+- Sharing a trip with other users (product.md, After the core).
 
 ## User flow & screens
 1. **Add a person.** On the trip page, the user types a name into the "Add person" field and submits. The name appears at the end of the people list. The field is cleared.
@@ -44,30 +44,11 @@ Screen names: Trip page (people section). No mock screens exist yet in `docs/des
 
 ## Data & contract
 
-**New table `People`:**
+**Person record:** a name (1 to 50 characters, stored trimmed), the trip it belongs to, and the time it was added, which sets the list order (F3.R5). Names are unique within a trip, ignoring letter case. A person is never edited, so there is no update time or update author. Deleting a trip removes its people (product.md Business rules R8).
 
-| Column | Type | Rules |
-|---|---|---|
-| Id | primary key | generated |
-| TripId | foreign key to Trips | required; cascades on trip delete (product.md Business rules R8) |
-| Name | text, max 50 | required; stored trimmed |
-| NormalizedName | text, max 50 | required; trimmed and lowercased; unique together with TripId |
-| CreatedAt | timestamp | required; also sets the list order (F3.R5) |
-| CreatedBy | user reference | required (audit fields, product standard) |
-| UpdatedAt, UpdatedBy | — | not used; people are never edited (F3.R8). Left out and noted here. |
+**Removal check:** a removal is refused when any expense (as payer or participant) or any payment (as payer or payee) on the trip uses the person. Payments arrive in F6; until then the check covers expenses only.
 
-Unique constraint: (TripId, NormalizedName).
-
-**Removal check** reads the Expenses table (payer and participants) and the Payments table (payer and payee). The Payments table comes in F6; until then the check reads expenses only and the payments part is added in F6.
-
-**API (proposed; the plan confirms the paths):**
-
-| Method and path | Request | Success | Errors |
-|---|---|---|---|
-| POST /api/trips/{tripId}/people | `{name}` | 201, person `{id, name}` | 400 with validation code; 409 duplicate name; 404 trip not the user's |
-| DELETE /api/trips/{tripId}/people/{personId} | none | 204 | 409 with `{error, blockedBy: [{type, id, description}]}`; 404 person or trip not the user's |
-
-Error shape: `{error: string, code: string, fields?: {[field]: string}}`. The 409 removal response also includes `blockedBy`.
+**Operations:** add a person; remove a person. A refused removal lists the expenses and payments that block it (F3.R7). Error codes are in States & errors.
 
 ## States & errors
 - **Empty list:** "No people yet" is not agreed. Copy **open**.
@@ -79,13 +60,13 @@ Error shape: `{error: string, code: string, fields?: {[field]: string}}`. The 40
 | `name_too_long` | name | More than 50 characters after trimming (F3.R2) | Add | open |
 | `name_taken` | name | Same name on this trip ignoring case (F3.R3) | Add | open |
 
-- **Blocked removal (409):** the message names each blocking expense or payment (F3.R7). The wording of the message is **open**.
+- **Blocked removal:** the message names each blocking expense or payment (F3.R7). The wording of the message is **open**.
 - **Server error:** copy **open**.
 - **Not logged in or not the owner:** handled by F1 (F1.R10, F1.R11); no new copy.
 
 ## Accessibility
 - The "Add person" field has a visible label. The Remove control has an accessible name that includes the person's name (for example "Remove Sam").
-- Validation errors are linked to the field with `aria-describedby`, and focus moves to the field on error.
+- Validation errors are linked to their field, so a screen reader reads each error with its field, and focus moves to the field on error.
 - A blocked removal is announced to screen readers and the blocking items are readable text, not colour alone.
 - Everything works with the keyboard, and Enter submits the add form.
 - Focus returns to the Add person field after a successful add.
@@ -98,8 +79,8 @@ Error shape: `{error: string, code: string, fields?: {[field]: string}}`. The 40
 - "Sam" on trip A and "Sam" on trip B: both accepted.
 - Person removed, then the same name added again: accepted. The new person is added at the end of the list (F3.R5).
 - Removing a person who only appears in a payment after F6 exists: blocked, as in F3.R6.
-- Two people on the same trip being added at the same moment with the same name: only one succeeds, because the unique constraint on (TripId, NormalizedName) rejects the second (`name_taken`).
-- Deleting a trip removes its people (cascade, product.md Business rules R8).
+- Two people on the same trip being added at the same moment with the same name: only one succeeds, because the name-uniqueness rule for the trip rejects the second (`name_taken`).
+- Deleting a trip removes its people (product.md Business rules R8).
 
 ## Acceptance criteria
 - **F3.AC1** Given a trip with Sam and Alex, when the user adds "Jo", then Jo appears last in the list.
@@ -113,6 +94,7 @@ Error shape: `{error: string, code: string, fields?: {[field]: string}}`. The 40
 - **F3.AC9** Given people added in the order Sam, Alex, Jo, when the list is shown, then it shows Sam, Alex, Jo in that order.
 - **F3.AC10** Given user A and a trip owned by user B, when user A adds or removes a person on it, then the response is 404 and nothing changes.
 - **F3.AC11** Given a new trip with no people, when the user views it, then the trip is valid and the empty state is shown.
+- **F3.AC12** Given a person on a trip, when the user looks for a way to change their name, then no edit control is shown and no request can change the name.
 
 ## Dependencies
 - **Depends on:** F1 (login and ownership checks, F1.R10, F1.R11), F2 (trips exist to hold people).
@@ -128,13 +110,14 @@ Unit tests only (project rules). Each test is mapped to its AC IDs.
 - **Unit: add-person handler with a mocked repository.** AC1 (new person added at the end), AC4 (duplicate returns `name_taken` when the repository reports a match), AC11 (zero people is valid).
 - **Unit: remove-person handler with mocked blockers.** AC5 (no blockers, removed), AC6 (payer blocker, 409 listing the expense), AC7 (participant blocker, 409 listing the expense), AC8 (payment blocker, 409 listing the payment; payment part uses the F6 check when it exists).
 - **Unit: people ordering.** AC9 (list is sorted by creation order).
-- **Unit: ownership guard for people endpoints with a mocked trip owner.** AC10 (non-owner gets 404, nothing changed).
+- **Unit: ownership guard for people requests with a mocked trip owner.** AC10 (non-owner gets 404, nothing changed).
 
 Code review only (need a real database or the full running app):
-- **AC4 (duplicate is also rejected by the database under a race):** unique constraint on (TripId, NormalizedName).
-- **Race case in Edge cases:** two simultaneous adds; only the unique constraint can prove this.
-- **Cascade on trip delete:** People rows removed with the trip.
+- **AC4 (duplicate is also rejected under a race):** name uniqueness must hold in stored data.
+- **Race case in Edge cases:** two simultaneous adds; only a check against stored data can prove this.
+- **Cascade on trip delete:** people removed with the trip.
 - **AC10 end to end:** full app returns 404 for another user's trip.
+- **AC12 (no rename):** no edit control or request exists; code review of the screen and the request list.
 
 ## Open questions
 - [ ] Exact wording for: `name_required`, `name_too_long`, `name_taken`, the blocked-removal message, the empty-list state, and the server error.
@@ -144,3 +127,5 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Minimum number of people on a trip? → None. Zero or more is allowed.
 - 2026-11-19: People list order? → Order they were added.
 - 2026-11-19: What does the user see when a removal is blocked? → A message that names the expense or payment blocking it.
+- 2026-11-24: Grader feedback: F3.R8 had no acceptance criterion → Added F3.AC12.
+- 2026-11-24: Grader feedback: spec named tables, endpoints and constraints → Replaced them with product terms; the plan decides the technical design.

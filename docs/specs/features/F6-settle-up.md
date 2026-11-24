@@ -1,6 +1,6 @@
 # F6 — Settle up
 
-_Status: Draft · Last updated: 2026-11-19 · Source: product.md Key terms (Suggested payment, Payment), Business rules R4 and R6, worked examples 1 and 3, Goals, MVP scope row F6_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Key terms (Suggested payment, Payment), Business rules R4 and R6, worked examples 1 and 3, Goals, MVP scope row F6_
 
 ## Summary
 The app proposes the fewest-step set of payments that would bring every balance to zero, and the user records each one as paid once the money has moved outside the app. Recording a payment changes the balances, so the next suggestions are worked out from the new balances. The user can delete a payment if it was recorded by mistake. The step is done when every suggested payment has been marked as paid and every balance is zero.
@@ -13,7 +13,7 @@ The app proposes the fewest-step set of payments that would bring every balance 
 
 ## Scope
 **In:**
-- Suggested payments, worked out from the current balances (product.md R6).
+- Suggested payments, worked out from the current balances (product.md Business rules R6).
 - Mark a suggested payment as paid. It becomes a Payment for its full amount.
 - A "Paid" list of payments, each with its payer, payee, amount and the time it was marked.
 - Delete a payment after confirmation.
@@ -35,51 +35,35 @@ The app proposes the fewest-step set of payments that would bring every balance 
 Screen names: Trip page (settle-up section: Suggested payments, Paid list). No mock screens exist yet in `docs/design`; layout is left to the plan.
 
 ## Requirements
-- **F6.R1** Suggested payments are worked out from the current balances, using the rule in product.md R6: repeatedly, the person owed the most is paid by the person who owes the most, for the smaller of their two amounts, until every balance is zero.
+- **F6.R1** Suggested payments are worked out from the current balances, using the rule in product.md Business rules R6: repeatedly, the person owed the most is paid by the person who owes the most, for the smaller of their two amounts, until every balance is zero.
 - **F6.R2** When two people have the same balance, the person added to the trip first is chosen first (F3.R5 order).
 - **F6.R3** Each suggested payment has a payer, a payee and an amount greater than zero. The amount is the smaller of the payer's debt and the payee's credit at that step.
 - **F6.R4** Marking a suggested payment as paid records a Payment with the same payer, payee and full amount. It also records the date and time it was marked.
 - **F6.R5** A Payment's payer and payee must be different people on the same trip.
-- **F6.R6** Payments are included in balances: a payer's balance increases and the payee's decreases by the payment amount (product.md R4; F5.R1).
+- **F6.R6** Payments are included in balances: a payer's balance increases and the payee's decreases by the payment amount (product.md Business rules R4; F5.R1).
 - **F6.R7** Suggestions are recalculated from the balances after every change, including a payment being marked, a payment being deleted, and an expense being added or deleted. Recording a payment therefore removes or reduces its suggestion (worked example 3).
 - **F6.R8** Deleting a Payment removes it. Its amount returns to the balances, and the suggestions are recalculated.
 - **F6.R9** A Payment cannot be edited.
-- **F6.R10** A person who is the payer or payee of a Payment cannot be removed from the trip (F3.R6, product.md R7).
+- **F6.R10** A person who is the payer or payee of a Payment cannot be removed from the trip (F3.R6, product.md Business rules R7).
 - **F6.R11** Viewing, marking and deleting payments require a logged-in user who owns the trip (F1.R10, F1.R11). Other users get a 404.
 
 ## Data & contract
 
-**New table `Payments`:**
+**Payment record:** the payer, the payee, the amount in whole cents (always greater than zero), the time it was marked as paid (F6.R4), and the user who marked it. A payment's payer and payee are different people on the same trip (F6.R5). Payments cannot be edited (F6.R9).
 
-| Column | Type | Rules |
-|---|---|---|
-| Id | primary key | generated |
-| TripId | foreign key to Trips | required; cascades on trip delete |
-| PayerPersonId | foreign key to People | required |
-| PayeePersonId | foreign key to People | required; different from PayerPersonId (F6.R5) |
-| AmountCents | integer | required; greater than 0 |
-| MarkedAt | timestamp | required; the time the payment was marked as paid (F6.R4) |
-| CreatedBy | user reference | required (audit field) |
+**Operations:**
+- View the suggested payments and the Paid list.
+- Mark a suggested payment as paid. The user never types the amount; the app takes it from the current suggestion for that payer and payee, so the payment always matches what the user saw (F6.R4).
+- Delete a payment.
 
-**API (proposed; the plan confirms the paths):**
-
-| Method and path | Request | Success | Errors |
-|---|---|---|---|
-| GET /api/trips/{tripId}/settlements | none | 200, `{suggested: [{payerPersonId, payerName, payeePersonId, payeeName, amount}], paid: [{id, payerName, payeeName, amount, markedAt}]}` | 404 |
-| POST /api/trips/{tripId}/payments | `{payerPersonId, payeePersonId}` | 201, the new payment | 400 `payer_equals_payee`; 404 trip or person not the user's; 409 `no_matching_suggestion` (see Open questions) |
-| DELETE /api/trips/{tripId}/payments/{paymentId} | none | 204 | 404 |
-
-- The amount is not sent by the client. The server takes it from the current suggestion for that payer and payee, so the payment always matches the suggestion the user saw (F6.R4).
-- Amounts are integer cents internally and are sent as decimal strings with two decimal places (for example `"40.00"`).
-
-Error shape: `{error: string, code: string}`.
+Refused requests: a payer and payee that are the same person (`payer_equals_payee`); a suggestion that no longer exists (`no_matching_suggestion`, see Open questions); a trip or person that is not the user's (404). Amounts are shown as text with two decimal places, for example "40.00".
 
 ## States & errors
 - **No suggestions (all settled):** copy **open**. Shown when every balance is zero.
 - **Empty Paid list:** copy **open**.
 - **Mark as paid confirmation:** the confirm step asks the user to confirm marking the payment as paid. The text and the confirm and cancel labels are **open**.
 - **Delete payment confirmation:** the confirm step asks the user to confirm deleting the payment. The text and labels are **open**.
-- **Suggestion no longer matches (409 `no_matching_suggestion`):** shown when the suggestion changed or disappeared while the user had the page open. Copy **open**.
+- **Suggestion no longer matches (`no_matching_suggestion`):** shown when the suggestion changed or disappeared while the user had the page open. Copy **open**.
 - **`payer_equals_payee`:** should never reach the user from the UI, since the form does not allow it. Copy **open** only if it can be shown.
 - **Server error:** copy **open**.
 - **Not logged in or not the owner:** handled by F1; no new copy.
@@ -117,6 +101,7 @@ Error shape: `{error: string, code: string}`.
 - **F6.AC10** Given a person who is a payer or payee of a Payment, when the user tries to remove them from the trip, then the removal is refused (see F3.AC8).
 - **F6.AC11** Given user A and a trip owned by user B, when user A views, marks or deletes a payment on it, then the response is 404 and nothing changes.
 - **F6.AC12** Given a recorded payment, when the balances are calculated, then the payer's balance has gone up and the payee's has gone down by the payment amount (F5.R1, F6.R6).
+- **F6.AC13** Given a payment in the Paid list, when the user looks for a way to change it, then no edit control is shown and no request can change its payer, payee or amount.
 
 ## Dependencies
 - **Depends on:** F1 (login and ownership), F2 (trips), F3 (people; removal rule), F4 (expenses), F5 (balances).
@@ -131,19 +116,20 @@ Unit tests only (project rules). Each test is mapped to its AC IDs.
 - **Unit: create-payment handler with mocked repositories.** AC3 (records full amount, payer, payee and time), AC8 (same payer and payee rejected), and the suggestion-match check (see Open questions).
 - **Unit: delete-payment handler.** AC4 (confirmed delete removes the payment; cancel is handled in the UI test).
 - **Unit: balance calculation including payments** (the F5 calculator with payments added). AC12.
-- **Unit: ownership guard for settlement endpoints with a mocked trip owner.** AC11.
+- **Unit: ownership guard for settlement requests with a mocked trip owner.** AC11.
 - **Unit: removal rule including payments** (the F3 removal check). AC10 (link to F3.AC8).
-- **Unit (frontend): Settle-up component with React Testing Library.** AC1 and AC2 as visible text, AC4 cancel keeps the payment, AC6 all-settled state, AC9 Paid list row content.
+- **Unit (frontend): Settle-up component test.** AC1 and AC2 as visible text, AC4 cancel keeps the payment, AC6 all-settled state, AC9 Paid list row content.
 
 Code review only (need a real database or the full running app):
 - **AC9 end to end:** Paid list reflects real stored payments and their times.
-- **Cascade on trip delete:** Payments removed with the trip.
-- **Foreign keys:** payer and payee must exist in People for this trip.
+- **Cascade on trip delete:** payments removed with the trip.
+- **Person check:** payer and payee must be people on this trip in stored data.
 - **AC11 end to end:** full app returns 404 for another user's trip.
 - **AC10 end to end:** a real removal attempt is refused in the database-backed app.
+- **AC13 (no edit):** no edit control or request exists; code review of the screen and the request list.
 
 ## Open questions
-- [ ] **Stale suggestion:** if a user marks a suggestion as paid after it has already changed or disappeared, should the app refuse it (409 `no_matching_suggestion`, as proposed in this spec), or record the payment for the amount they saw? Recording the wrong amount would unbalance the trip, so refusing is the safer default, but this is the user's call.
+- [ ] **Stale suggestion:** if a user marks a suggestion as paid after it has already changed or disappeared, should the app refuse it (`no_matching_suggestion`, as proposed in this spec), or record the payment for the amount they saw? Recording the wrong amount would unbalance the trip, so refusing is the safer default, but this is the user's call.
 - [ ] **Paid list order:** newest first, oldest first, or grouped by payer? Not yet chosen.
 - [ ] Exact wording for: the all-settled state, the empty Paid list, both confirmation steps (text and buttons), the stale-suggestion message, and the server error.
 
@@ -153,3 +139,5 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Where do paid payments appear? → A "Paid" list under the suggestions, with the delete option.
 - 2026-11-19: Confirm before marking a payment as paid? → Yes.
 - 2026-11-19: Record when a payment was marked as paid? → Yes, store the date and time.
+- 2026-11-24: Grader feedback: F6.R9 had no acceptance criterion → Added F6.AC13.
+- 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.

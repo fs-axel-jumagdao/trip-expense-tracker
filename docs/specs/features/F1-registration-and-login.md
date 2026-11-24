@@ -1,9 +1,9 @@
 # F1 — Registration and login
 
-_Status: Approved · Last updated: 2026-11-19 · Source: product.md Roles, Assumptions, Goals, MVP scope row F1_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Roles, Assumptions, Goals, MVP scope row F1_
 
 ## Summary
-A visitor creates an account with an email and password, then logs in and out. Every trip belongs to one account, and every trip request checks that the logged-in user owns it. This is the first build step, because nothing else can be safely built without it. Passwords are stored only as hashes.
+A visitor creates an account with an email and password, then logs in and out. Every trip belongs to one account, and every trip request checks that the logged-in user owns it. This is the first build step, because nothing else can be safely built without it. Passwords are stored only in hashed form.
 
 ## User stories
 - As a visitor, I want to register with an email and password, so that I can start tracking trips.
@@ -16,11 +16,11 @@ A visitor creates an account with an email and password, then logs in and out. E
 - Login and logout.
 - A session that lasts 7 days after login.
 - Hashed password storage.
-- The login check and the ownership check that every trip endpoint uses (the checks are built here; the trip endpoints themselves come in F2–F6).
+- The login check and the ownership check that every trip request uses (the checks are built here; the trip requests themselves come in F2–F6).
 
 **Out:**
-- Email verification and password reset (product.md Assumptions, "No email verification or password reset").
-- Sharing trips with other users (product.md After the core, "After the core").
+- Email verification and password reset (product.md Assumptions: "No email verification or password reset").
+- Sharing trips with other users (product.md, After the core).
 - Account deletion and profile editing (not in product.md; out of MVP).
 - Login through a third party (not in product.md; out of scope).
 
@@ -37,38 +37,22 @@ Screen names: Register, Log in. No mock screens exist yet in `docs/design`; the 
 - **F1.R1** Registration takes an email, a password and a confirm-password value, and creates one account per email.
 - **F1.R2** A password must be at least 8 characters. There are no other composition rules.
 - **F1.R3** Before saving, the email is trimmed of surrounding spaces and lowercased. It must have a basic valid format (one `@`, with a dot in the domain part). It must be unique across accounts.
-- **F1.R4** The password is stored only as a salted hash. The plain-text password is never stored, returned, or logged. (product.md Roles: "hashed passwords".)
+- **F1.R4** The password is stored only in hashed form. The plain-text password is never stored, returned, or logged. (product.md Roles: "hashed passwords".)
 - **F1.R5** Login takes an email and password. The email is normalised the same way as in F1.R3 before the lookup.
 - **F1.R6** A failed login (unknown email or wrong password) shows the same message in both cases: "Email or password is incorrect".
 - **F1.R7** A successful registration logs the new user in and sends them to the trip list.
 - **F1.R8** A successful login starts a session that expires 7 days after login. The expiry is fixed; it is not extended by activity.
 - **F1.R9** Logout ends every session of that user, on all devices. Requests made with any of those sessions are then treated as logged out.
-- **F1.R10** Every trip endpoint requires a valid session. A request without a valid session gets a 401 response and no trip data.
-- **F1.R11** Every trip endpoint checks that the trip belongs to the logged-in user. If it does not, the response is 404, the same as for a trip that does not exist. (product.md Roles, ownership rule; Goals: "No user can see or change another user's trips".)
+- **F1.R10** Every trip request requires a valid session. A request without a valid session gets a 401 response and no trip data.
+- **F1.R11** Every trip request checks that the trip belongs to the logged-in user. If it does not, the response is 404, the same as for a trip that does not exist. (product.md Roles, ownership rule; Goals: "No user can see or change another user's trips".)
 
 ## Data & contract
 
-**New table `users`:**
+**Account:** an account holds an email (trimmed, lowercased, and unique across all accounts), a password stored only in hashed form, and the time the account was created.
 
-| Column | Type | Rules |
-|---|---|---|
-| id | primary key | generated |
-| email | text | required; stored trimmed and lowercased; unique |
-| password_hash | text | required; never the plain password |
-| created_at | timestamp | required |
+**Sessions:** a session is created at login and lasts 7 days from login. Logout ends it, and logout ends every session of that user (F1.R9).
 
-**Sessions:** a session record (or signed token) is created at login and expires 7 days later. Its storage choice (database table or signed token) is left to the plan. It must be invalidated at logout. Each session is linked to its user, so logout can end all of that user's sessions at once.
-
-**API (proposed; the plan confirms the paths):**
-
-| Method and path | Request | Success | Errors |
-|---|---|---|---|
-| POST /api/auth/register | `{email, password, confirmPassword}` | 201, user `{id, email}`, session set | 400 with field errors (see States & errors); 409 if email already exists |
-| POST /api/auth/login | `{email, password}` | 200, user `{id, email}`, session set | 401 `{error: "Email or password is incorrect"}` |
-| POST /api/auth/logout | none | 204, session ended | none |
-| All trip endpoints (F2–F6) | session required | per endpoint | 401 when no valid session; 404 when the trip is not the user's |
-
-Error shape for all of the above: `{error: string, fields?: {[field]: string}}`. The final copy for each error is open (see Open questions).
+**Operations:** register, log in, log out, and every trip request. A trip request without a valid session returns no trip data (F1.R10). Each operation returns success or one of the errors listed in States & errors. Each error has a code and a message; the wording of each message is open (see Open questions).
 
 ## States & errors
 - **Loading:** the submit button is disabled while a request is in flight, and it shows a loading label. Copy for the label: to be set in the plan (no user wording given; treated as implementation detail).
@@ -89,11 +73,11 @@ Error shape for all of the above: `{error: string, fields?: {[field]: string}}`.
 Field-level checks run in the order listed. The server returns the first failing code for each field, so one field shows one message at a time.
 - **Login failure:** "Email or password is incorrect" (the user chose this wording). Shown above the form. Password field is cleared.
 - **Server error:** copy **open**. Shown when the request fails for a reason other than the cases above.
-- **Logged-out API request:** 401 with `{error: "Not logged in"}`. Copy **open** (API-only; no screen shows it if the frontend redirects first).
+- **Logged-out request:** the user gets a "Not logged in" response. Copy **open** (no screen shows it if the frontend redirects first).
 
 ## Accessibility
 - Every field has a visible label. Placeholder text is not used as a label.
-- Errors are linked to their field with `aria-describedby`, and the error summary is announced to screen readers.
+- Errors are linked to their field, so a screen reader reads each error with its field. The error summary is announced to screen readers.
 - After a failed submit, focus moves to the error summary.
 - The forms can be used entirely by keyboard, and Enter submits.
 - Focus outlines stay visible. Text and error colours meet WCAG AA contrast.
@@ -114,18 +98,19 @@ Field-level checks run in the order listed. The server returns the first failing
 - **F1.AC2** Given a password of 7 characters, when the visitor registers, then the request is rejected with the password error and no account is created.
 - **F1.AC3** Given the email `  Sam@Example.com `, when the visitor registers, then the stored email is `sam@example.com`.
 - **F1.AC4** Given an account exists for `sam@example.com`, when someone registers `SAM@example.com`, then the request is rejected with the duplicate-email error.
-- **F1.AC5** Given a registered user, when the user table is read, then the password appears only as a hash that is not equal to the password, and it is never returned in any response or log line.
+- **F1.AC5** Given a registered user, when the stored account data is read, then the password appears only in hashed form, that form is not equal to the password, and the password is never returned in any response or log line.
 - **F1.AC6** Given a registered user, when they log in with the correct email and password, then a session is created. Given a wrong password or an unknown email, then both return "Email or password is incorrect".
 - **F1.AC7** Given a user logged in on two devices, when they log out on one, then both sessions end and a trip request made from either device returns 401.
 - **F1.AC8** Given a session created at time T, when a request is made at T + 7 days + 1 second, then the request is treated as logged out and returns 401.
-- **F1.AC9** Given no session, when any trip endpoint is called, then the response is 401 and contains no trip data.
+- **F1.AC9** Given no session, when any trip request is made, then the response is 401 and contains no trip data.
 - **F1.AC10** Given a logged-out visitor, when they open a trip page, then they are sent to the Log in screen, and after a successful login they return to that page.
 - **F1.AC11** Given user A is logged in and trip T belongs to user B, when user A requests trip T, then the response is 404, the same response as for a trip ID that does not exist.
+- **F1.AC12** Given a registered user with the email `sam@example.com`, when they log in with `  SAM@example.com `, then the login succeeds.
 
 ## Dependencies
 - **Depends on:** none. This is build step 1.
-- **Needed by:** F2–F6 (every trip endpoint uses the login and ownership checks in F1.R10 and F1.R11).
-- **External services:** none. Password hashing uses a library chosen in the plan.
+- **Needed by:** F2–F6 (every trip request uses the login and ownership checks in F1.R10 and F1.R11).
+- **External services:** none. The hashing method is chosen in the plan.
 
 ## Test plan
 Unit tests only (project rules). Each test is mapped to its AC IDs.
@@ -134,19 +119,19 @@ Unit tests only (project rules). Each test is mapped to its AC IDs.
 - **Unit: email normaliser and format check.** AC3 (trim and lowercase), part of AC4 (`SAM@example.com` and `sam@example.com` normalise to the same value), invalid format rejected.
 - **Unit: registration service with a mocked user repository.** AC1 (valid input returns a logged-in user), AC4 (duplicate returns the duplicate error when the repository reports a match).
 - **Unit: password hashing.** AC5 (hash differs from the password; hash verifies the correct password and rejects a wrong one; the hash is not returned in the service's result).
-- **Unit: login service with a mocked repository.** AC6 (correct credentials create a session; wrong password and unknown email return the same error).
+- **Unit: login service with a mocked repository.** AC6 (correct credentials create a session; wrong password and unknown email return the same error), AC12 (email is trimmed and lowercased before the lookup).
 - **Unit: session expiry check with an injected clock.** AC8 (just before 7 days valid; at and after 7 days, invalid).
 - **Unit: auth guard with a mocked session.** AC9 (no session gives 401 without calling the trip handler).
 - **Unit: ownership check with mocked repository.** AC11 (another user's trip returns 404; a missing trip returns 404).
 
 Code review only (need a real database or the full running app):
-- **AC4 (duplicate, case-insensitive):** the unique constraint on `email` must hold in the database.
-- **AC5 (no plain text in storage or logs):** check the table and logger calls.
-- **AC7 (logout ends all sessions in storage):** every session row for the user must be removed or invalidated.
+- **AC4 (duplicate, case-insensitive):** email uniqueness must hold in stored data.
+- **AC5 (no plain text in storage or logs):** check stored data and logging.
+- **AC7 (logout ends all sessions in storage):** every session for the user must be removed or invalidated.
 - **AC10 (redirect and return-to-page):** full-app behaviour.
 
 ## Open questions
-- [ ] Exact wording for: email missing or invalid format; password under 8 characters; confirm password does not match; email already registered; server error; logged-out API message ("Not logged in" is a placeholder).
+- [ ] Exact wording for: email missing or invalid format; password under 8 characters; confirm password does not match; email already registered; server error; logged-out message ("Not logged in" is a placeholder).
 
 ## Decisions log
 - 2026-11-19: Password rules? → Minimum 8 characters, no other rules.
@@ -161,5 +146,6 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Who writes registration error copy? → The user will supply exact wording (left open; not filled in).
 - 2026-11-19: Should logout end sessions on all devices or only the current one? → All devices (F1.R9, F1.AC7).
 - 2026-11-19: Apply all error validations? → Yes. Every validation listed under States & errors applies. The wording is still open.
-- 2026-11-19: Apply all error validations → Added a validation table (codes, rules, when checked). Copy for every code except `credentials_invalid` is still open.
 - 2026-11-19: Approval → Approved by the user (status set to Approved). Copy for the open error messages is still pending, so it is listed under Open questions.
+- 2026-11-24: Grader feedback: F1.R5 had no acceptance criterion → Added F1.AC12. Status set back to Draft until re-approved.
+- 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.

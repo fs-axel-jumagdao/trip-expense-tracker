@@ -1,6 +1,6 @@
 # F<N> — <Feature name>: implementation plan
 
-_Status: Draft · Last updated: <YYYY-MM-DD> · Spec: docs/specs/features/F<N>-<slug>.md (Approved <YYYY-MM-DD>) · Standards: docs/rules/, .claude/CLAUDE.md_
+_Status: Draft · Last updated: <YYYY-MM-DD> · Spec: docs/specs/features/F<N>-<slug>.md (Approved <YYYY-MM-DD>) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 Checks run before this plan was written. Any failure stops the plan, so every row here should say Pass.
@@ -17,7 +17,7 @@ Checks run before this plan was written. Any failure stops the plan, so every ro
 Why this feature is being built and what the spec asks for, in 2–4 sentences. Name the dependencies (F-IDs) and the build-order step from the spec.
 
 ## Standards check
-Each applicable rule from `docs/rules/` and `.claude/CLAUDE.md`, with how this plan meets it. A conflict is written as a conflict, never silently worked around.
+Each applicable rule from `docs/rules/` and `CLAUDE.md`, with how this plan meets it. A conflict is written as a conflict, never silently worked around.
 
 | Source | Rule | How this plan complies, or the conflict |
 |---|---|---|
@@ -28,11 +28,11 @@ Each applicable rule from `docs/rules/` and `.claude/CLAUDE.md`, with how this p
 | docs/rules/project-rules.md | Times stored in UTC | … |
 | docs/rules/project-rules.md | Passwords hashed; no secrets; no plain-text logging | … |
 | docs/rules/project-rules.md | Logger only; no print or console statements | … |
-| .claude/CLAUDE.md | Vertical slice layout, feature-based folders | … |
-| .claude/CLAUDE.md | MediatR, FluentValidation, EF Core directly (no generic repository) | … |
-| .claude/CLAUDE.md | Audit fields on major entities (CreatedAt, CreatedBy, UpdatedAt, UpdatedBy) | … |
-| .claude/CLAUDE.md | Strict TypeScript; no `any`; TanStack Query and React Hook Form with Zod | … |
-| .claude/CLAUDE.md | Minimum 80% coverage for business logic, handlers and validators | … |
+| CLAUDE.md | Vertical slice layout, feature-based folders | … |
+| CLAUDE.md | MediatR, FluentValidation, EF Core directly (no generic repository) | … |
+| CLAUDE.md | Audit fields on major entities (CreatedAt, CreatedBy, UpdatedAt, UpdatedBy) | … |
+| CLAUDE.md | Strict TypeScript; no `any`; TanStack Query and React Hook Form with Zod | … |
+| CLAUDE.md | Minimum 80% coverage for business logic, handlers and validators | … |
 
 Add or remove rows for rules that do not apply, and say why in the row.
 

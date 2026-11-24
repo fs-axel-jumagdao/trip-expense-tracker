@@ -1,6 +1,6 @@
 # F4 — Expenses
 
-_Status: Draft · Last updated: 2026-11-19 · Source: product.md Goals, Roles, Key terms, Assumptions, Business rules R1–R3 and R8, worked examples 1–2, MVP scope row F4_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Goals, Roles, Key terms, Assumptions, Business rules R1–R3 and R8, worked examples 1–2, MVP scope row F4_
 
 ## Summary
 A user records a shared cost: what it was, how much, who paid, and who shares it. Each expense is split equally to the cent, and the split is saved with the expense so balances can always be recalculated exactly. The user can delete an expense after confirming, and cannot edit one. Adding an expense should take four inputs (product.md Goals).
@@ -21,7 +21,7 @@ A user records a shared cost: what it was, how much, who paid, and who shares it
 
 **Out:**
 - Editing an expense. Product.md Assumptions: a mistake is fixed by deleting and adding again.
-- Uneven splits, custom percentages, or a participant with a different share (product.md After the core, "After the core").
+- Uneven splits, custom percentages, or a participant with a different share (product.md, After the core).
 - Currencies or conversion (product.md Assumptions).
 - Categories, receipts, or attachments (not in product.md; out of MVP).
 
@@ -49,39 +49,11 @@ Screen names: Trip page (Add expense form, Expense list). No mock screens exist 
 
 ## Data & contract
 
-**New table `Expenses`:**
+**Expense record:** a description (1 to 200 characters, stored trimmed), an amount in whole cents that is always greater than zero, the payer, the trip it belongs to, the time it was added (which sets the list order, F4.R9), and the user who added it. Deleting an expense removes its shares. Deleting a trip removes its expenses (product.md Business rules R8).
 
-| Column | Type | Rules |
-|---|---|---|
-| Id | primary key | generated |
-| TripId | foreign key to Trips | required; cascades on trip delete |
-| Description | text, max 200 | required; stored trimmed |
-| AmountCents | integer | required; greater than 0 |
-| PayerPersonId | foreign key to People | required |
-| CreatedAt | timestamp | required; sets list order (F4.R9) |
-| CreatedBy | user reference | required (audit field) |
+**Shares:** each participant's share is stored with the expense. The shares for one expense always add up to its amount exactly (F4.R7). The payer has a share only if they are also a participant.
 
-**New table `ExpenseShares`:**
-
-| Column | Type | Rules |
-|---|---|---|
-| ExpenseId | foreign key to Expenses | required; cascades on expense delete |
-| PersonId | foreign key to People | required; unique together with ExpenseId |
-| ShareCents | integer | required; zero or more |
-
-Rule enforced in the handler and tested: the sum of `ShareCents` for an expense equals `AmountCents` exactly (F4.R7). Each participant has one row. The payer has a row only if they are also a participant.
-
-**API (proposed; the plan confirms the paths):**
-
-| Method and path | Request | Success | Errors |
-|---|---|---|---|
-| POST /api/trips/{tripId}/expenses | `{description, amount, payerPersonId, participantPersonIds: []}` where `amount` is a decimal string such as `"90.00"` | 201, expense with `{id, description, amount, payer, shares: [{person, amount}]}` | 400 with validation code; 404 trip or person not the user's or not on the trip |
-| GET /api/trips/{tripId}/expenses | none | 200, list newest first | 404 |
-| DELETE /api/trips/{tripId}/expenses/{expenseId} | none | 204 | 404 |
-
-The amount is sent and returned as a decimal string and stored as integer cents, so no floating-point value is used at any step.
-
-Error shape: `{error: string, code: string, fields?: {[field]: string}}`.
+**Operations:** add an expense (returns the saved expense with each person's share); list the trip's expenses, newest first; delete an expense. Amounts are sent and shown as text with two decimal places, for example "90.00". Each error has a code and a message (see States & errors).
 
 ## States & errors
 - **Empty list:** copy **open**.
@@ -104,7 +76,7 @@ Error shape: `{error: string, code: string, fields?: {[field]: string}}`.
 
 ## Accessibility
 - Every field has a visible label. The participant selection is a set of labelled checkboxes, one per person, and the payer is a labelled select.
-- Validation errors are linked to their field with `aria-describedby`, and focus moves to the first invalid field on submit.
+- Validation errors are linked to their field, so a screen reader reads each error with its field, and focus moves to the first invalid field on submit.
 - The delete confirmation is a modal dialog: focus moves into it, Escape cancels, focus returns to the Delete button on cancel.
 - The Delete button's accessible name includes the expense description (for example "Delete Dinner").
 - Everything works with the keyboard. The amount field accepts a decimal keypad on touch devices.
@@ -153,17 +125,17 @@ Unit tests only (project rules). Each test is mapped to its AC IDs.
 - **Unit: add-expense handler with mocked repositories.** AC1 (saved with shares), AC4, AC5, AC9 (person not on trip), AC6 (accepted when payer is not a participant).
 - **Unit: expense list ordering.** AC10.
 - **Unit: delete handler.** AC11 (confirmed delete removes expense and its shares; cancel leaves it, covered by the UI step).
-- **Unit: ownership guard for expense endpoints with a mocked trip owner.** AC12.
-- **Unit: Add expense form component (Vitest + React Testing Library).** AC13 (all people selected by default, no payer selected), and the delete confirmation step for AC11 (cancel keeps the expense).
+- **Unit: ownership guard for expense requests with a mocked trip owner.** AC12.
+- **Unit (frontend): Add expense form component test.** AC13 (all people selected by default, no payer selected), and the delete confirmation step for AC11 (cancel keeps the expense).
 
 Code review only (need a real database or the full running app):
-- **Cascade on expense delete:** `ExpenseShares` rows removed with the expense.
+- **Cascade on expense delete:** share rows removed with the expense.
 - **Cascade on trip delete:** expenses and shares removed with the trip (product.md Business rules R8).
-- **Foreign keys:** payer and participant must be people in the database; the server check (`person_not_on_trip`) is the same rule enforced on the server.
+- **Person check:** payer and participants must be people on this trip in stored data; the server check (`person_not_on_trip`) enforces the same rule.
 - **AC12 end to end:** full app returns 404 for another user's trip.
 
 ## Open questions
-- [ ] How should an amount with more than 2 decimal places be rounded? Options: round half up (10.005 becomes 10.01) or round down (10.005 becomes 10.00). Needed before F4.R2 can be built.
+- [ ] How should an amount with more than 2 decimal places be rounded? Options: round half up (10.005 becomes 10.01) or round down (10.005 becomes 10.00). Needed before F4.R2 can be built, and F4.R2 needs an acceptance criterion once this is decided.
 - [ ] Exact wording for: `description_required`, `description_too_long`, `amount_required`, `amount_not_a_number`, `amount_not_positive`, `payer_required`, `participants_required`, `person_not_on_trip`, the empty list, the delete confirmation (text and buttons), and the server error.
 - [ ] After a successful add, does the form close or stay open with the fields cleared? (Affects AC13 and the flow; the plan can decide, but the user should confirm.)
 
@@ -174,3 +146,4 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Delete confirmation? → Yes, confirm before deleting.
 - 2026-11-19: Expense list order? → Newest first.
 - 2026-11-19: Amount with more than 2 decimals? → Round to 2 decimals. The rounding method is still open.
+- 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.

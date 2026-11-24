@@ -19,7 +19,7 @@ Step-by-step flow. Reference the mock screens on `docs/design` (if available) by
 - **F<N>.R1** …
 
 ## Data & contract
-Changes to schemas, browser storage, or the API (request and response, error shapes). Write "None" if there are none.
+What data the feature stores and what the user can read or change, in product terms: the fields and their rules. No table names, endpoints or libraries; the plan decides those. Write "None" if there are none.
 
 ## States & errors
 Loading, empty, validation errors, and the user-facing copy for each.

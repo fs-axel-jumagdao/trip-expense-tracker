@@ -1,6 +1,6 @@
 # F5 — Balances
 
-_Status: Draft · Last updated: 2026-11-19 · Source: product.md Goals, Key terms (Balance), Business rules R4 and R5, worked examples 1 and 3, MVP scope row F5_
+_Status: Draft · Last updated: 2026-11-24 · Source: product.md Goals, Key terms (Balance), Business rules R4 and R5, worked examples 1 and 3, MVP scope row F5_
 
 ## Summary
 The trip shows each person's balance: how much they are owed, or how much they owe, after all expenses and payments. Balances are worked out from the saved expenses, so they are always current and always add up to exactly zero. This is the number the settle-up step (F6) works from.
@@ -15,11 +15,11 @@ The trip shows each person's balance: how much they are owed, or how much they o
 - Show each person's balance on the trip, worded as "is owed", "owes" or "Settled".
 - Show every person on the trip, including people with no expenses.
 - Order the list by the order people were added (F3.R5).
-- Check on every calculation that the balances add up to zero (product.md R5). If they do not, log a warning.
+- Check on every calculation that the balances add up to zero (product.md Business rules R5). If they do not, log a warning.
 
 **Out:**
 - Showing each person's total paid and total share (not in F5; the user chose balance only).
-- Payments in the balance. Payments are added in F6 (product.md R4). Until F6 exists, balance = paid − share.
+- Payments in the balance. Payments are added in F6 (product.md Business rules R4). Until F6 exists, balance = paid − share.
 - Balances in another currency, or per-expense balances (product.md Assumptions: one currency).
 - Showing the mismatch warning to the user. It is written to the log only.
 
@@ -44,21 +44,11 @@ Screen names: Trip page (balances section). No mock screens exist yet in `docs/d
 
 ## Data & contract
 
-**No new tables.** Balances are calculated from `Expenses`, `ExpenseShares` (F4) and, after F6, `Payments`.
+**No new stored data.** Balances are worked out from the expenses and their shares (F4), and from payments after F6.
 
-**API (proposed; the plan confirms the path):**
+**Operations:** view balances. The result has one row per person, in add order (F5.R5). Each row has the person's name, a status (owed, owes or settled), and an amount with two decimal places that is always positive. The status carries the direction, so the amount never has a minus sign. Errors: not logged in, or trip not the user's (F1.R10, F1.R11).
 
-| Method and path | Request | Success | Errors |
-|---|---|---|---|
-| GET /api/trips/{tripId}/balances | none | 200, list in add order: `[{personId, name, balance, status}]` | 404 |
-
-- `balance` is a decimal string with two decimal places, always positive (for example `"50.00"`). The sign is carried by `status`.
-- `status` is one of `owed`, `owes` or `settled`.
-- The amounts are integer cents internally and are converted to the decimal string only at the API edge.
-
-Error shape: `{error: string, code: string}`.
-
-**Log entry on mismatch (F5.R8):** a structured warning with the trip ID and the total that should have been zero (for example `Balances for trip {TripId} sum to {TotalCents} cents, expected 0`). It contains no names, descriptions or amounts per person.
+**Log entry on mismatch (F5.R8):** a warning is written to the log with the trip and the total that should have been zero. It contains no names, descriptions or per-person amounts.
 
 ## States & errors
 - **Loading:** the balances section shows a loading indicator until the list arrives. Copy: open (no user wording given; treated as an implementation detail for the plan).
@@ -71,7 +61,7 @@ Error shape: `{error: string, code: string}`.
 ## Accessibility
 - Each row is a list item that reads as one sentence to a screen reader, for example "Sam is owed 50.00".
 - The label is text, not colour alone. "is owed", "owes" and "Settled" are each distinct words.
-- The table or list has a heading, and the balances section is reachable by keyboard.
+- The list has a heading, and the balances section is reachable by keyboard.
 - Text and label colours meet WCAG AA contrast.
 - No animation is needed, so reduced motion has no effect.
 
@@ -110,8 +100,8 @@ Unit tests only (project rules). Each test is mapped to its AC IDs.
 - **Unit: balance label formatter** (positive, negative, zero; two decimal places; no minus sign). AC2, AC3, AC4, AC11.
 - **Unit: ordering** (rows follow add order). AC6.
 - **Unit: mismatch check with a mocked logger.** AC8 (warning logged, balances still returned, no names or amounts in the log message).
-- **Unit: balances endpoint handler with a mocked trip owner.** AC10 (non-owner gets 404).
-- **Unit (frontend): Balances component with React Testing Library.** AC2, AC3, AC4, AC5 as visible text and in order (AC6).
+- **Unit: balances request handler with a mocked trip owner.** AC10 (non-owner gets 404).
+- **Unit (frontend): Balances component test.** AC2, AC3, AC4, AC5 as visible text and in order (AC6).
 
 Code review only (need a real database or the full running app):
 - **AC9 end to end:** the balances change after a real expense is deleted.
@@ -127,3 +117,4 @@ Code review only (need a real database or the full running app):
 - 2026-11-19: Balances list order? → Order people were added to the trip.
 - 2026-11-19: Show paid and share totals too? → No. Balance only.
 - 2026-11-19: What if balances do not add up to zero? → Show the balances anyway and log a warning.
+- 2026-11-24: Grader feedback: spec named tables, endpoints and libraries → Replaced them with product terms; the plan decides the technical design.
