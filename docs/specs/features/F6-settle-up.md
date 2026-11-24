@@ -1,6 +1,6 @@
 # F6 — Settle up
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Key terms (Suggested payment, Payment), Business rules R4 and R6, worked examples 1 and 3, Goals, MVP scope row F6_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Key terms (Suggested payment, Payment), Business rules R4 and R6, worked examples 1 and 3, Goals, MVP scope row F6_
 
 ## Summary
 The app proposes the fewest-step set of payments that would bring every balance to zero, and the user records each one as paid once the money has moved outside the app. Recording a payment changes the balances, so the next suggestions are worked out from the new balances. The user can delete a payment if it was recorded by mistake. The step is done when every suggested payment has been marked as paid and every balance is zero.

@@ -1,6 +1,6 @@
 # F4 — Expenses
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Goals, Roles, Key terms, Assumptions, Business rules R1–R3 and R8, worked examples 1–2, MVP scope row F4_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Goals, Roles, Key terms, Assumptions, Business rules R1–R3 and R8, worked examples 1–2, MVP scope row F4_
 
 ## Summary
 A user records a shared cost: what it was, how much, who paid, and who shares it. Each expense is split equally to the cent, and the split is saved with the expense so balances can always be recalculated exactly. The user can delete an expense after confirming, and cannot edit one. Adding an expense should take four inputs (product.md Goals).

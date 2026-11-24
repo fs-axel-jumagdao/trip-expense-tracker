@@ -1,6 +1,6 @@
 # F3 — People
 
-_Status: Draft · Last updated: 2026-11-24 · Source: product.md Roles, Key terms, Assumptions, Business rules R2 and R7, MVP scope row F3_
+_Status: Approved · Last updated: 2026-11-24 · Source: product.md Roles, Key terms, Assumptions, Business rules R2 and R7, MVP scope row F3_
 
 ## Summary
 A user adds the people on one of their trips and removes them again. People are names only. They have no accounts and cannot log in. A person who is part of any expense or payment cannot be removed, so the balances can never lose someone who owes or is owed money.
