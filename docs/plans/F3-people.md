@@ -1,6 +1,6 @@
 # F3 — People: implementation plan
 
-_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F3-people.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-25 · Spec: docs/specs/features/F3-people.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -63,7 +63,7 @@ Endpoints: `GET /api/trips/{tripId}/people`, `POST /api/trips/{tripId}/people`, 
 |---|---|---|---|---|
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F3.T1 | People entity configuration and migration | server/Persistence/Configurations/PersonConfiguration.cs, server/Persistence/Migrations/<timestamp>_AddPeople.cs | F3.AC4 (storage) | Migration applies to an empty database. Needs approval (migration). |
+| F3.T1 | People entity configuration and migration | server/Persistence/Entities/Person.cs, server/Persistence/Configurations/PersonConfiguration.cs, server/Persistence/AppDbContext.cs, server/Persistence/Migrations/<timestamp>_AddPeople.cs | F3.AC4 (storage) | Migration applies to an empty database. Needs approval (migration). |
 | F3.T2 | Name rules: trim, length 1 to 50, normalise | server/Features/People/AddPerson/AddPersonValidator.cs, server/Features/People/AddPerson/PersonNameRules.cs, tests/Application.Tests/People/PersonNameRulesTests.cs | F3.AC2, F3.AC3, F3.AC4 (part) | Validator tests pass. |
 | F3.T3 | Add person use case | server/Features/People/AddPerson/AddPersonCommand.cs, server/Features/People/AddPerson/AddPersonHandler.cs, server/Features/People/AddPerson/AddPersonEndpoint.cs, tests/Application.Tests/People/AddPersonHandlerTests.cs | F3.AC1, F3.AC4, F3.AC11 | Handler tests pass with a mocked repository. |
 | F3.T4 | Removal check interface | server/Features/People/RemovalRules/IPersonReferenceCheck.cs, server/Features/People/RemovalRules/PersonReferenceResult.cs, server/Features/People/RemovalRules/PaymentReferenceCheckStub.cs | F3.AC8 (interface; payment part stubbed until F6) | Interface and stub compile; stub returns "none" until F6. |
@@ -108,4 +108,6 @@ None.
 ## Decisions log
 - 2026-11-24: Audit fields → All four on People, `UpdatedAt` and `UpdatedBy` null.
 - 2026-11-24: Removal check → an interface with an expense implementation (F4) and a payment implementation (F6), with F3 testing the rule through the interface.
+- 2026-11-25: Entity class file (Person.cs) and AppDbContext.cs added to F3.T1, which the plan had not named. Plan returned to Draft for re-approval.
+- 2026-11-25: Re-approved by the user.
 - 2026-11-24: Plan approved by the user, including its migrations.

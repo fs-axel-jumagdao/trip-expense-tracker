@@ -1,6 +1,6 @@
 # F4 — Expenses: implementation plan
 
-_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F4-expenses.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-25 · Spec: docs/specs/features/F4-expenses.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -68,15 +68,16 @@ Endpoints: `GET /api/trips/{tripId}/expenses`, `POST /api/trips/{tripId}/expense
 |---|---|---|---|---|
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F4.T1 | Expense and share entity configuration and migration | server/Persistence/Configurations/ExpenseConfiguration.cs, server/Persistence/Configurations/ExpenseShareConfiguration.cs, server/Persistence/Migrations/<timestamp>_AddExpenses.cs | F4.AC8 (storage) | Migration applies to an empty database. Needs approval (migration). |
-| F4.T2 | Amount parser with half-up rounding | server/Features/Expenses/Shared/AmountParser.cs, tests/Application.Tests/Expenses/AmountParserTests.cs | F4.AC2, F4.AC14 | `dotnet test --filter "FullyQualifiedName~F4_AC2|F4_AC14"` passes. |
-| F4.T3 | Split calculator | server/Features/Expenses/Shared/SplitCalculator.cs, tests/Application.Tests/Expenses/SplitCalculatorTests.cs | F4.AC1, F4.AC7, F4.AC8 | Split tests pass, including sampled amounts. |
-| F4.T4 | Description validator | server/Features/Expenses/AddExpense/AddExpenseValidator.cs, tests/Application.Tests/Expenses/AddExpenseValidatorTests.cs | F4.AC3 | Validator tests pass. |
-| F4.T5 | Add expense use case | server/Features/Expenses/AddExpense/AddExpenseCommand.cs, server/Features/Expenses/AddExpense/AddExpenseHandler.cs, server/Features/Expenses/AddExpense/AddExpenseEndpoint.cs, server/Features/Expenses/AddExpense/AddExpenseResponse.cs, tests/Application.Tests/Expenses/AddExpenseHandlerTests.cs | F4.AC1, F4.AC4, F4.AC5, F4.AC6, F4.AC9 | Handler tests pass with mocked repositories and a mocked transaction. |
-| F4.T6 | Saved shares for balances | server/Features/Expenses/Shared/SavedShareReader.cs, tests/Application.Tests/Expenses/SavedShareReaderTests.cs | F4.AC16 | Reader returns saved shares unchanged; tests pass. |
-| F4.T7 | List and delete expense use cases | server/Features/Expenses/ListExpenses/ListExpensesHandler.cs, server/Features/Expenses/DeleteExpense/DeleteExpenseHandler.cs, server/Features/Expenses/DeleteExpense/DeleteExpenseEndpoint.cs, tests/Application.Tests/Expenses/ListAndDeleteExpenseTests.cs | F4.AC10, F4.AC11 | Tests pass with mocked repositories. |
-| F4.T8 | Ownership checks on expense requests | server/Features/Expenses/ExpenseAccessFilter.cs, tests/Application.Tests/Expenses/ExpenseAccessFilterTests.cs | F4.AC12 | Guard test passes. |
-| F4.T9 | Add expense form, list and delete dialog | client/src/features/expenses/components/AddExpenseForm.tsx, client/src/features/expenses/components/ExpenseList.tsx, client/src/features/expenses/components/DeleteExpenseDialog.tsx, client/src/features/expenses/schemas/expenseSchemas.ts, client/src/tests/expenses/ExpenseScreens.test.tsx | F4.AC11 (cancel), F4.AC13, F4.AC15 | Component tests pass. |
+| F4.T1 | Expense and share entities and configurations | server/Persistence/Entities/Expense.cs, server/Persistence/Entities/ExpenseShare.cs, server/Persistence/Configurations/ExpenseConfiguration.cs, server/Persistence/Configurations/ExpenseShareConfiguration.cs, server/Persistence/AppDbContext.cs | F4.AC8 (storage) | Both configurations compile and `dotnet build` passes. |
+| F4.T2 | Expense migration | server/Persistence/Migrations/<timestamp>_AddExpenses.cs | F4.AC8 (storage) | Migration applies to an empty database. Needs approval (migration). |
+| F4.T3 | Amount parser with half-up rounding | server/Features/Expenses/Shared/AmountParser.cs, tests/Application.Tests/Expenses/AmountParserTests.cs | F4.AC2, F4.AC14 | `dotnet test --filter "FullyQualifiedName~F4_AC2|F4_AC14"` passes. |
+| F4.T4 | Split calculator | server/Features/Expenses/Shared/SplitCalculator.cs, tests/Application.Tests/Expenses/SplitCalculatorTests.cs | F4.AC1, F4.AC7, F4.AC8 | Split tests pass, including sampled amounts. |
+| F4.T5 | Description validator | server/Features/Expenses/AddExpense/AddExpenseValidator.cs, tests/Application.Tests/Expenses/AddExpenseValidatorTests.cs | F4.AC3 | Validator tests pass. |
+| F4.T6 | Add expense use case | server/Features/Expenses/AddExpense/AddExpenseCommand.cs, server/Features/Expenses/AddExpense/AddExpenseHandler.cs, server/Features/Expenses/AddExpense/AddExpenseEndpoint.cs, server/Features/Expenses/AddExpense/AddExpenseResponse.cs, tests/Application.Tests/Expenses/AddExpenseHandlerTests.cs | F4.AC1, F4.AC4, F4.AC5, F4.AC6, F4.AC9 | Handler tests pass with mocked repositories and a mocked transaction. |
+| F4.T7 | Saved shares for balances | server/Features/Expenses/Shared/SavedShareReader.cs, tests/Application.Tests/Expenses/SavedShareReaderTests.cs | F4.AC16 | Reader returns saved shares unchanged; tests pass. |
+| F4.T8 | List and delete expense use cases | server/Features/Expenses/ListExpenses/ListExpensesHandler.cs, server/Features/Expenses/DeleteExpense/DeleteExpenseHandler.cs, server/Features/Expenses/DeleteExpense/DeleteExpenseEndpoint.cs, tests/Application.Tests/Expenses/ListAndDeleteExpenseTests.cs | F4.AC10, F4.AC11 | Tests pass with mocked repositories. |
+| F4.T9 | Ownership checks on expense requests | server/Features/Expenses/ExpenseAccessFilter.cs, tests/Application.Tests/Expenses/ExpenseAccessFilterTests.cs | F4.AC12 | Guard test passes. |
+| F4.T10 | Add expense form, list and delete dialog | client/src/features/expenses/components/AddExpenseForm.tsx, client/src/features/expenses/components/ExpenseList.tsx, client/src/features/expenses/components/DeleteExpenseDialog.tsx, client/src/features/expenses/schemas/expenseSchemas.ts, client/src/tests/expenses/ExpenseScreens.test.tsx | F4.AC11 (cancel), F4.AC13, F4.AC15 | Component tests pass. |
 
 ## Test plan
 | AC | Unit test | Or code review (reason) |
@@ -105,7 +106,7 @@ Frontend component tests: F4.AC11 (cancel keeps the expense), F4.AC13 (defaults)
 2. Code review, against a real database: transaction for add and delete, cascade on delete, shares sum to the amount in stored data.
 
 ## Needs a person's approval
-- **Database migrations:** Expenses and ExpenseShares (F4.T1).
+- **Database migrations:** Expenses and ExpenseShares (F4.T2).
 
 ## Risks and conflicts
 - **Deviation: money example.** CLAUDE.md's example uses `decimal`; this plan stores cents, following the project rule. Recorded above.
@@ -120,3 +121,5 @@ None.
 - 2026-11-24: Form after add → clears and stays open (user decision, F4.AC15).
 - 2026-11-24: Audit fields → all four on Expenses and ExpenseShares.
 - 2026-11-24: Plan approved by the user, including its migrations.
+- 2026-11-25: F4.T1 split into F4.T1 (entities and configurations) and F4.T2 (migration) to stay within five files; later tasks renumbered F4.T3 to F4.T10. Plan returned to Draft for re-approval.
+- 2026-11-25: Re-approved by the user.
