@@ -527,9 +527,11 @@ function writeSessionLog(logDir, log) {
 function writeUsageFile(logDir, usageFile) {
   const lines = [];
   for (const f of fs.readdirSync(logDir).filter((n) => n.endsWith('.md'))) {
-    const found = usageLines(fs.readFileSync(path.join(logDir, f), 'utf8'));
+    const markdown = fs.readFileSync(path.join(logDir, f), 'utf8');
+    const found = usageLines(markdown);
     if (found.length) lines.push(...found);
-    else logError(`usage.md: no model segments or session total found in ${f}`);
+    // A session with no model calls (Models: —) has no usage to record; that is not an error.
+    else if (!/\*\*Models:\*\* —/.test(markdown)) logError(`usage.md: no model segments or session total found in ${f}`);
   }
   writeFileRetry(usageFile, lines.sort().map((l) => `${l}\n`).join(''));
 }
