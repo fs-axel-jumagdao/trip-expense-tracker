@@ -1,6 +1,6 @@
 # F6 — Settle up: implementation plan
 
-_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F6-settle-up.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-25 · Spec: docs/specs/features/F6-settle-up.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -65,7 +65,7 @@ Endpoints: `GET /api/trips/{tripId}/settlements`, `POST /api/trips/{tripId}/paym
 |---|---|---|---|---|
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F6.T1 | Payment entity configuration and migration | server/Persistence/Configurations/PaymentConfiguration.cs, server/Persistence/Migrations/<timestamp>_AddPayments.cs | F6.AC3 (storage of time and amount) | Migration applies to an empty database. Needs approval (migration). |
+| F6.T1 | Payment entity configuration and migration | server/Persistence/Entities/Payment.cs, server/Persistence/Configurations/PaymentConfiguration.cs, server/Persistence/AppDbContext.cs, server/Persistence/Migrations/<timestamp>_AddPayments.cs | F6.AC3 (storage of time and amount) | Migration applies to an empty database. Needs approval (migration). |
 | F6.T2 | Settlement algorithm | server/Features/Settlements/Shared/SettlementAlgorithm.cs, server/Features/Settlements/Shared/SettlementSuggestion.cs, tests/Application.Tests/Settlements/SettlementAlgorithmTests.cs | F6.AC1, F6.AC2, F6.AC5, F6.AC6, F6.AC7 | Algorithm tests pass, including worked examples 1 and 3. |
 | F6.T3 | Mark as paid use case | server/Features/Settlements/MarkPaid/MarkPaidCommand.cs, server/Features/Settlements/MarkPaid/MarkPaidValidator.cs, server/Features/Settlements/MarkPaid/MarkPaidHandler.cs, server/Features/Settlements/MarkPaid/MarkPaidEndpoint.cs, tests/Application.Tests/Settlements/MarkPaidHandlerTests.cs | F6.AC3, F6.AC8, F6.AC15 | Handler tests pass with mocked repositories and a mocked transaction. |
 | F6.T4 | Delete payment use case | server/Features/Settlements/DeletePayment/DeletePaymentCommand.cs, server/Features/Settlements/DeletePayment/DeletePaymentHandler.cs, server/Features/Settlements/DeletePayment/DeletePaymentEndpoint.cs, tests/Application.Tests/Settlements/DeletePaymentHandlerTests.cs | F6.AC4 | Handler tests pass with mocked repositories. |
@@ -115,4 +115,6 @@ None.
 - 2026-11-24: Stale suggestion → refuse and show a message; nothing recorded (user decision, F6.AC15).
 - 2026-11-24: Paid list order → newest first (user decision, F6.AC14).
 - 2026-11-24: Audit fields → all four on Payments.
+- 2026-11-25: Entity class file (Payment.cs) and AppDbContext.cs added to F6.T1, which the plan had not named. Plan returned to Draft for re-approval.
+- 2026-11-25: Re-approved by the user.
 - 2026-11-24: Plan approved by the user, including its migrations.

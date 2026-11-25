@@ -1,6 +1,6 @@
 # F2 — Trips: implementation plan
 
-_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F2-trips.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-25 · Spec: docs/specs/features/F2-trips.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -64,7 +64,7 @@ Endpoints: `GET /api/trips`, `POST /api/trips`, `GET /api/trips/{tripId}`, `DELE
 |---|---|---|---|---|
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F2.T1 | Trip entity configuration and migration | server/Persistence/Configurations/TripConfiguration.cs, server/Persistence/Migrations/<timestamp>_AddTrips.cs | F2.AC12 (storage) | Migration applies to an empty database. Needs approval (migration). |
+| F2.T1 | Trip entity configuration and migration | server/Persistence/Entities/Trip.cs, server/Persistence/Configurations/TripConfiguration.cs, server/Persistence/AppDbContext.cs, server/Persistence/Migrations/<timestamp>_AddTrips.cs | F2.AC12 (storage) | Migration applies to an empty database. Needs approval (migration). |
 | F2.T2 | Trip name validator | server/Features/Trips/CreateTrip/CreateTripValidator.cs, tests/Application.Tests/Trips/CreateTripValidatorTests.cs | F2.AC2, F2.AC3 | `dotnet test --filter "FullyQualifiedName~F2_AC2|F2_AC3"` passes. |
 | F2.T3 | Create trip use case | server/Features/Trips/CreateTrip/CreateTripCommand.cs, server/Features/Trips/CreateTrip/CreateTripHandler.cs, server/Features/Trips/CreateTrip/CreateTripEndpoint.cs, server/Features/Trips/CreateTrip/CreateTripResponse.cs, tests/Application.Tests/Trips/CreateTripHandlerTests.cs | F2.AC1, F2.AC4, F2.AC13 | Create tests pass with a mocked repository. |
 | F2.T4 | List trips use case | server/Features/Trips/ListTrips/ListTripsQuery.cs, server/Features/Trips/ListTrips/ListTripsHandler.cs, server/Features/Trips/ListTrips/ListTripsEndpoint.cs, server/Features/Trips/ListTrips/ListTripsResponse.cs, tests/Application.Tests/Trips/ListTripsHandlerTests.cs | F2.AC5, F2.AC6, F2.AC11 | List tests pass (owner filter, order, empty). |
@@ -111,5 +111,7 @@ None.
 
 ## Decisions log
 - 2026-11-24: Audit fields on Trips → All four, `UpdatedAt` and `UpdatedBy` left null (user decision on audit fields).
+- 2026-11-25: Entity class file (Trip.cs) and AppDbContext.cs added to F2.T1, which the plan had not named. Plan returned to Draft for re-approval.
+- 2026-11-25: Re-approved by the user.
 - 2026-11-24: Cascade → one `TripDeletion` service, so each feature registers its child deletes in one place.
 - 2026-11-24: Plan approved by the user, including its migrations.

@@ -1,6 +1,6 @@
 # F1 — Registration and login: implementation plan
 
-_Status: Approved · Last updated: 2026-11-24 · Spec: docs/specs/features/F1-registration-and-login.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
+_Status: Approved · Last updated: 2026-11-25 · Spec: docs/specs/features/F1-registration-and-login.md (Approved 2026-11-24) · Standards: docs/rules/, CLAUDE.md_
 
 ## Validation record
 | Check | Result |
@@ -73,7 +73,7 @@ Existing code to reuse: none. The repo has no application code yet, so these pat
 |---|---|---|---|---|
 | Task | Title | Files | ACs covered | Done when |
 |---|---|---|---|---|
-| F1.T1 | Users and Sessions entity configuration | server/Persistence/Configurations/UserConfiguration.cs, server/Persistence/Configurations/SessionConfiguration.cs, server/Persistence/AppDbContext.cs | F1.AC4, F1.AC5, F1.AC7 (storage) | Both configurations compile and `dotnet build` passes. |
+| F1.T1 | Users and Sessions entity configuration | server/Persistence/Entities/User.cs, server/Persistence/Entities/Session.cs, server/Persistence/Configurations/UserConfiguration.cs, server/Persistence/Configurations/SessionConfiguration.cs, server/Persistence/AppDbContext.cs | F1.AC4, F1.AC5, F1.AC7 (storage) | Both configurations compile and `dotnet build` passes. |
 | F1.T2 | Migration | server/Persistence/Migrations/<timestamp>_AddUsersAndSessions.cs | F1.AC4 (storage) | Migration applies to an empty database. Needs approval (migration). |
 | F1.T3 | Email normaliser and password rule | server/Features/Auth/Register/EmailNormaliser.cs, server/Features/Auth/Register/RegisterValidator.cs, tests/Application.Tests/Auth/EmailNormaliserTests.cs, tests/Application.Tests/Auth/RegisterValidatorTests.cs | F1.AC2, F1.AC3, F1.AC12 | `dotnet test --filter "FullyQualifiedName~F1_AC2|F1_AC3|F1_AC12"` passes. |
 | F1.T4 | Password hashing | server/Infrastructure/PasswordHasherService.cs, server/Infrastructure/IPasswordHasherService.cs, tests/Application.Tests/Auth/PasswordHasherTests.cs | F1.AC5 | Hash tests pass. |
@@ -115,7 +115,7 @@ Unit tests only. Test names include the AC ID.
 ## Needs a person's approval
 - **Authentication or sessions:** the session design in Approach (F1.T5, F1.T6). This is a deliberate departure from CLAUDE.md's JWT settings.
 - **Secrets or environment files:** any session key or cookie-signing key is set through environment variables. Nothing is committed.
-- **Database migrations:** the Users and Sessions migration (F1.T1).
+- **Database migrations:** the Users and Sessions migration (F1.T2).
 
 ## Risks and conflicts
 - **Conflict: session design vs CLAUDE.md. Resolved 2026-11-24.** CLAUDE.md lists `Jwt__Key`, `Jwt__Issuer` and `Jwt__Audience`. A JWT cannot be revoked on logout (F1.R9) without storing revoked tokens, which makes it stateful anyway. The user chose server-side sessions. CLAUDE.md now has a note saying the JWT settings are not used for login.
@@ -131,3 +131,8 @@ None. Copy and rules are settled in the spec.
 - 2026-11-24: Audit fields → All four on every entity (user decision).
 - 2026-11-24: Loading labels with "…" → Finished copy, not placeholders (user decision).
 - 2026-11-24: Plan approved by the user, including its migrations.
+- 2026-11-25: Entity class files (User.cs, Session.cs) added to F1.T1, which the plan had not named. Plan returned to Draft for re-approval.
+- 2026-11-25: Re-approved by the user.
+- 2026-11-25: Session foreign key to Users with cascade delete (user decision). Migration AddUsersAndSessions generated for review (F1.T2); not yet confirmed.
+- 2026-11-25: Audit fields CreatedBy and UpdatedBy are text (nvarchar(36)) holding the creating user's Id, not a Guid column (user decision). Migration regenerated accordingly; the earlier Guid version was never approved and was removed from the repo.
+- 2026-11-25: Audit field length changed to 320 (nvarchar(320)), the same as Email. Migration AddUsersAndSessions (20261125080242) approved by the user, which completes F1.T2.
